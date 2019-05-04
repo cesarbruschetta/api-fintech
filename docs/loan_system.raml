@@ -1,0 +1,155 @@
+#%RAML 1.0
+title: Fintech API
+baseUri: https://squad6.hero
+documentation:
+  - title: Fintech API
+    content: Manage the loan payments control system from a fintech
+version: v1
+mediaType: application/json
+protocols: [ HTTP, HTTPS ]
+
+securitySchemes:
+  JWT:
+    description: Authentic this to any method that needs a valid JWT to be set.
+    type: x-{other}
+    describedBy:
+      headers:
+        Authorization:
+            description: X-AuthToken
+            type: string
+            required: true
+      responses:
+        401:
+          description: Authentication problem (JWT not set or expired)
+
+types:
+  Loan:
+    properties:
+      amount:
+        description: The amount of the loan payment, in dollars
+        type: number
+        format: float
+      term:
+        description: Number of months that will take until the loan gets paid-off
+        type: integer
+      rate:
+        description: Interest rate as decimal
+        type: number
+        format: float
+      date:
+        description: when the loan was requested (origination date as an ISO 8601 string)
+        type: datetime
+    example: {
+              "amount": 1000,
+              "term": 12,
+              "rate": 0.05,
+              "date": "2019-05-09T03:18:00Z"
+              }
+        
+  Loan_info:
+    properties:
+      loan_id:
+        description: Unique id of the loan
+        type: string
+      installment:
+        description: Monthly loan payment
+        type: number
+        format: float
+    example: {
+              "loan_id": "000-0000-0000-0000",
+              "installment": 85.60
+             }
+        
+  LoanBalance:
+    properties:
+      balance:
+        description: Outstanding debt of loan
+        type: number
+        format: float
+    example: {
+              "balance": 40
+             }
+        
+  Payment:
+    properties:
+      payment:
+        description: Type of payment
+        type: string
+        enum: ['made','missed']
+      date:
+        description: Payment date
+        type: datetime
+      amount:
+        description: Amount of the payment made or missed in dollars
+        type: number
+        format: float
+    example: {
+              "payment": "made",
+              "date": "2019-05-09T03:18:00Z",
+              "amount": 85.60
+             }
+        
+traits:
+  dataValidation:
+    responses:
+      400:
+        description: Parameters received on body request are not valid 
+        body:
+          properties:
+            error: string
+            code: string
+  uriValidation:
+    responses: 
+      404:
+        description: ID received on uri not found
+        body: 
+          properties:
+            error: string
+            code: string
+
+/loans:
+  post:
+    is: [dataValidation]
+    description: Create a new loan. Loans are automatically accepted.
+    securedBy: JWT
+    body:
+        type: Loan
+    responses:
+        201:
+            description: Return the new loan
+            body: Loan_info
+
+  '/{id}':
+    uriParameters:
+      id:
+        description: The Loan identifier
+        type: string
+
+    /payment:
+      post:
+        is: [dataValidation, uriValidation]
+        description:  Create a record of a payment made or missed.
+        securedBy: JWT
+        body: 
+            type: Payment
+        responses:
+          201:
+            description:  Success, receive the remaining amount about payment id
+
+    /balance:
+      get:
+        is: [dataValidation, uriValidation]
+        description: Get the volume of outstanding LoanBalance (i.e., LoanBalance yet to be paid) at some point in time
+        securedBy: JWT
+        queryParameters: 
+            date:
+              displayName: Date
+              description: loan balance until the param date if empty return all loan balance.
+              type: datetime
+              example: "2019-05-09T03:18:00Z"     
+              required: false    
+        responses:
+          200:
+            description:  Balance, outstanding debt of loan
+            body: LoanBalance
+                          
