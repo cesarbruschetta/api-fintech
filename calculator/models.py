@@ -31,6 +31,12 @@ class Loan(models.Model):
     Loan Model
     Defines the attributes of a loan
     """
+    amount = models.DecimalField('Amount', max_digits=15, decimal_places=2)
+    term = models.IntegerField('Term')
+    rate = models.DecimalField('Rate', max_digits=15, decimal_places=2)
+    date_initial = models.DateTimeField('Date creation', auto_now=False, auto_now_add=False)
+    installment = models.DecimalField('Installment', max_digits=15, decimal_places=2,default=Decimal('0000000000000.00'))
+    objects = LoanManager()
 
     client = models.ForeignKey(Client, on_delete=models.DO_NOTHING)
     amount = models.DecimalField(
