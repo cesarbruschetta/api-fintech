@@ -4,7 +4,7 @@ from django.utils import timezone
 
 class Loans(models.Model):
     amount = models.FloatField()
-    term = models.IntegerField()
+    term = models.PositiveIntegerField()
     rate = models.FloatField()
     date = models.DateTimeField(default=timezone.now)
 
