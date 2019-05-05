@@ -24,7 +24,7 @@ class CreateNewLoanTest(TestCase):
             "amount": 1000,
             "term": 0,
             "rate": 0.05,
-            "date": ""
+            "date": "2019-05-09 03:18Z"
         }
 
     def test_create_valid_loan(self):
