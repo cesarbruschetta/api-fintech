@@ -6,5 +6,5 @@ from .serializers import LoanSerializer
 
 
 @api_view(['POST'])
-def post_loan(request):
-    return response({})
+def post_loans(request):
+    return Response({})
