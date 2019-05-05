@@ -45,7 +45,7 @@ class Payment(models.Model):
     loan_id = models.ForeignKey('Loan', on_delete=models.CASCADE)
     PAYMENT_CHOICES = (('MD', 'Made'), ('MS', 'Missed'))
     type = models.CharField('Type', max_length=2, choices=PAYMENT_CHOICES, default='MD')
-    date = models.DateField('Date', auto_now=False, auto_now_add=False)
+    date = models.DateTimeField('Date', auto_now=False, auto_now_add=False)
     amount = models.DecimalField('Amount', max_digits=15, decimal_places=2)
 
     class Meta:

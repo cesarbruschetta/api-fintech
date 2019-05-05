@@ -1,5 +1,5 @@
 from django.test import TestCase
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 
 from ..models import Loan, Payment
@@ -10,7 +10,7 @@ class LoanTest(TestCase):
     
     def setUp(self):
         Loan.objects.create_loan(
-            amount=Decimal('1000.00'), term=12, rate=Decimal('0.05'), date_initial=datetime(2019,3,24)
+            amount=Decimal('1000.00'), term=12, rate=Decimal('0.05'), date_initial=datetime(2019,3,24,11,30).astimezone(tz=timezone.utc)
         )
 
     def test_loan(self):
@@ -21,7 +21,7 @@ class LoanTest(TestCase):
     def test_payment_made(self):
         loan_01 = Loan.objects.get(amount=Decimal('1000.00'))
         Payment.objects.create(
-            loan_id=loan_01, type='MD', date=datetime(2019,4,24), amount=Decimal('100')
+            loan_id=loan_01, type='MD', date=datetime(2019,4,24).astimezone(tz=timezone.utc), amount=Decimal('100')
         )
         payment = Payment.objects.get(type='MD')
         self.assertEqual(
@@ -30,7 +30,7 @@ class LoanTest(TestCase):
     def test_payment_missed(self):
         loan_01 = Loan.objects.get(amount=Decimal('1000.00'))
         Payment.objects.create(
-            loan_id=loan_01, type='MS', date=datetime(2019,4,24), amount=Decimal('200')
+            loan_id=loan_01, type='MS', date=datetime(2019,4,24).astimezone(tz=timezone.utc), amount=Decimal('200')
         )
         payment = Payment.objects.get(type='MS')
         self.assertEqual(
@@ -43,7 +43,7 @@ class LoanTest(TestCase):
     def test_payment_error(self):
         loan_01 = Loan.objects.get(amount=Decimal('1000.00'))
         Payment.objects.create(
-            loan_id=loan_01, type='0', date=datetime(2019,4,24), amount=Decimal('300')
+            loan_id=loan_01, type='0', date=datetime(2019,4,24).astimezone(tz=timezone.utc), amount=Decimal('300')
         )
         payment = Payment.objects.get(type='0')
         self.assertEqual(
