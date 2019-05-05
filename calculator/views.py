@@ -1,10 +1,23 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from decimal import Decimal
+from datetime import datetime
+
 from .models import Loan
 from .serializers import LoanSerializer
 
-
 @api_view(['POST'])
 def post_loans(request):
-    return Response({})
+    data = {
+        'amount': Decimal(request.data.get('amount')),
+        'term': int(request.data.get('term')),
+        'rate': Decimal(request.data.get('term')),
+        'date_initial': datetime.strptime(request.data.get('date'), '%Y-%m-%d %H:%MZ')
+    }
+    serializer = LoanSerializer(data=data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    print(serializer.errors)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
