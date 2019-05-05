@@ -10,7 +10,7 @@ class LoanTest(TestCase):
 
     def setUp(self):
         Loan.objects.create(
-            amount=Decimal('1000.00'), term=12, rate=Decimal('0.05'), date_initial=datetime(2019,3,24), installment=Decimal('0.00')
+            amount=Decimal('1000.00'), term=12, rate=Decimal('0.05'), date_initial=datetime(2019,3,24)
         )
 
     def test_loan(self):

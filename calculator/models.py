@@ -1,4 +1,5 @@
 from django.db import models
+from decimal import Decimal
 
 
 class Loan(models.Model): 
@@ -10,7 +11,7 @@ class Loan(models.Model):
     term = models.IntegerField('Term')
     rate = models.DecimalField('Rate', max_digits=15, decimal_places=2)
     date_initial = models.DateField('Date creation', auto_now=False, auto_now_add=False)
-    installment = models.DecimalField('Installment', max_digits=15, decimal_places=2)
+    installment = models.DecimalField('Installment', max_digits=15, decimal_places=2,default=Decimal('0000000000000.00'))
 
     class Meta:
         verbose_name = 'Loan'
@@ -21,6 +22,12 @@ class Loan(models.Model):
 
     def get_absolute_url(self):
         return reverse("_detail", kwargs={"pk": self.pk})
+
+    @classmethod
+    def create(cls, title, ):
+        book = cls(title=title)
+        # do something with the book
+        return book
 
 
 class Payment(models.Model):
