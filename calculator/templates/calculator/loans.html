@@ -1,0 +1,14 @@
+{% extends "calculator/base.html" %}
+<head>
+    <title>New Loan Request</title>
+</head>
+
+{% block content %}
+
+{% for loan in Loans.objects %}
+    print(loan)
+
+{% endfor %}
+
+
+{% endblock content %}
