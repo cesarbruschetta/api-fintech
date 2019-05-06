@@ -61,13 +61,3 @@ class Payments(models.Model):
         def __str__(self):
             return self.name
 
-
-class Balance(models.Model):
-    loan = models.ForeignKey(Loans, on_delete='PROTECT')
-    
-    def balance(self):
-        selection = loan.objects.filter(loan_id=self.loan.id, paid='made')
-        return self.amount - sum([pay.amount for pay in selection])
-
-    class Meta:
-        abstract = True
