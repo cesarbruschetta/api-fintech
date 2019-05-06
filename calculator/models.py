@@ -1,6 +1,7 @@
 from django.db import models
 from decimal import Decimal
-from datetime import datetime
+from datetime import datetime, timezone
+
 
 class LoanManager(models.Manager):
     def create_loan(self, *args, **kwargs):
@@ -8,7 +9,7 @@ class LoanManager(models.Manager):
         loan.save_installment()
         return loan
 
-    def get_balance(self, loan_id, date_base=datetime.now()):
+    def get_balance(self, loan_id, date_base=datetime.now().astimezone(tz=timezone.utc)):
         try:
             loan = self.get(pk=loan_id)
             payments = Payment.objects.filter(loan_id=loan_id, type='MD', date__lte=date_base)
