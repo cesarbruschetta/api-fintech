@@ -1,3 +1,4 @@
+from django.contrib.postgres.validators import RangeMinValueValidator
 from django.db import models
 from decimal import Decimal
 from datetime import datetime, timezone
@@ -23,9 +24,18 @@ class Loan(models.Model):
     Loan Model
     Defines the attributes of a loan
     """
-    amount = models.DecimalField('Amount', max_digits=15, decimal_places=2)
-    term = models.IntegerField('Term')
-    rate = models.DecimalField('Rate', max_digits=15, decimal_places=2)
+    amount = models.DecimalField('Amount', max_digits=15, decimal_places=2,
+                                 validators=[
+                                  RangeMinValueValidator(Decimal('0.01'))
+                                 ])
+    term = models.IntegerField('Term',
+                               validators=[
+                                RangeMinValueValidator(1)
+                               ])
+    rate = models.DecimalField('Rate', max_digits=15, decimal_places=2,
+                               validators=[
+                                RangeMinValueValidator(Decimal('0.01'))
+                               ])
     date_initial = models.DateTimeField('Date creation', auto_now=False, auto_now_add=False)
     installment = models.DecimalField('Installment', max_digits=15, decimal_places=2,default=Decimal('0000000000000.00'))
     objects = LoanManager()
@@ -45,6 +55,7 @@ class Loan(models.Model):
         self.installment = (r + r / ((1 + r) ** self.term - 1)) * self.amount
         return self.save()
 
+
 class Payment(models.Model):
     """
     Payment Model
@@ -54,7 +65,10 @@ class Payment(models.Model):
     PAYMENT_CHOICES = (('MD', 'Made'), ('MS', 'Missed'))
     type = models.CharField('Type', max_length=2, choices=PAYMENT_CHOICES, default='MD')
     date = models.DateTimeField('Date', auto_now=False, auto_now_add=False)
-    amount = models.DecimalField('Amount', max_digits=15, decimal_places=2)
+    amount = models.DecimalField('Amount', max_digits=15, decimal_places=2,
+                                 validators=[
+                                    RangeMinValueValidator(Decimal('0.01'))
+                                 ])
 
     class Meta:
         verbose_name = 'Payment'
