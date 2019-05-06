@@ -9,7 +9,7 @@ class LoanTest(TestCase):
     """ Test module for Loan and Payment model """
     
     def setUp(self):
-        Loan.objects.create_loan(
+        Loan.objects.create(
             amount=Decimal('1000.00'), term=12, rate=Decimal('0.05'), date_initial=datetime(2019,3,24,11,30).astimezone(tz=timezone.utc)
         )
 
@@ -54,7 +54,7 @@ class BalanceTest(TestCase):
     """ Test module for Balance model """
     
     def setUp(self):
-        self.loan_01 = Loan.objects.create_loan(
+        self.loan_01 = Loan.objects.create(
             amount=Decimal('1000.00'), term=12, rate=Decimal('0.05'), date_initial=datetime(2019,3,24,11,30).astimezone(tz=timezone.utc)
         )
         Payment.objects.create(
