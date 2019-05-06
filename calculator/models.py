@@ -41,11 +41,7 @@ class Loans(models.Model):
 
 
 class Payments(models.Model):
-    payment_status = (
-        ('missed', 'missed'),
-        ('made', 'made'),
-    )
-
+    payment_status = (('missed', 'Missed'),('made', 'Made'))
     loan = models.ForeignKey(Loans, on_delete='PROTECT')
     paid = models.CharField(choices=payment_status, max_length=6)
     amount = models.FloatField()
@@ -64,10 +60,19 @@ class Payments(models.Model):
 
 class Balance(models.Model):
     loan = models.ForeignKey(Loans, on_delete='PROTECT')
-    
-    def balance(self):
-        selection = loan.objects.filter(loan_id=self.loan.id, paid='made')
-        return self.amount - sum([pay.amount for pay in selection])
+
+    @property
+    def get_balance(self):
+        payments = Payments.objects.filter(loan=self.loan, paid='made')
+        return self.loan.amount - sum([pay.amount for pay in payments])
 
     class Meta:
         abstract = True
+        verbose_name = 'Balance'
+        verbose_name_plural = "Balances"
+
+        def __str__():
+            return 'Balance: {self.get_balance}'
+
+        def __repr__():
+            return 'Balance(loan={self.loan})'
