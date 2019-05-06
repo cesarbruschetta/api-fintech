@@ -10,10 +10,10 @@ from .serializers import LoanSerializer
 @api_view(['POST'])
 def post_loans(request):
     data = {
-        'amount': Decimal(request.data.get('amount')),
-        'term': int(request.data.get('term')),
-        'rate': Decimal(request.data.get('term')),
-        'date_initial': datetime.strptime(request.data.get('date'), '%Y-%m-%d %H:%MZ')
+        'amount': request.data.get('amount'),
+        'term': request.data.get('term'),
+        'rate': request.data.get('term'),
+        'date_initial': request.data.get('date')
     }
     serializer = LoanSerializer(data=data)
     if serializer.is_valid():
