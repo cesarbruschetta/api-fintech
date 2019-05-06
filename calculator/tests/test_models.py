@@ -6,7 +6,7 @@ from ..models import Loan, Payment
 
 
 class LoanTest(TestCase):
-    """ Test module for Loan model """
+    """ Test module for Loan and Payment model """
     
     def setUp(self):
         Loan.objects.create_loan(
@@ -49,3 +49,32 @@ class LoanTest(TestCase):
         self.assertEqual(
             payment.amount, Decimal('300'))
 
+
+class BalanceTest(TestCase):
+    """ Test module for Balance model """
+    
+    def setUp(self):
+        self.loan_01 = Loan.objects.create_loan(
+            amount=Decimal('1000.00'), term=12, rate=Decimal('0.05'), date_initial=datetime(2019,3,24,11,30).astimezone(tz=timezone.utc)
+        )
+        Payment.objects.create(
+            loan_id=self.loan_01, type='MD', date=datetime(2019,4,24).astimezone(tz=timezone.utc), amount=Decimal('200')
+        )
+        Payment.objects.create(
+            loan_id=self.loan_01, type='MD', date=datetime(2019,4,24).astimezone(tz=timezone.utc), amount=Decimal('200')
+        )
+        Payment.objects.create(
+            loan_id=self.loan_01, type='MS', date=datetime(2019,4,24).astimezone(tz=timezone.utc), amount=Decimal('200')
+        )
+    
+    def test_balance_loan_valid(self):
+        self.assertEqual(Loan.objects.get_balance(loan_id=self.loan_01.pk, date_base=datetime(2019,4,25).astimezone(tz=timezone.utc)), Decimal('600'))
+    
+    def test_balance_loan_invalid(self):
+        self.assertEqual(Loan.objects.get_balance(0, date_base=datetime(2019,3,25).astimezone(tz=timezone.utc)), Decimal('0'))
+
+    def test_balance_without_payments(self):
+        self.assertEqual(Loan.objects.get_balance(loan_id=self.loan_01.pk, date_base=datetime(2019,3,25).astimezone(tz=timezone.utc)), self.loan_01.amount)
+    
+    def test_balance_loan_without_date_base(self):
+        self.assertEqual(Loan.objects.get_balance(loan_id=self.loan_01.pk), Decimal('600'))

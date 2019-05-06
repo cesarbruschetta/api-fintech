@@ -1,12 +1,20 @@
 from django.db import models
 from decimal import Decimal
-
+from datetime import datetime
 
 class LoanManager(models.Manager):
     def create_loan(self, *args, **kwargs):
         loan = self.create(*args, **kwargs)
         loan.save_installment()
         return loan
+
+    def get_balance(self, loan_id, date_base=datetime.now()):
+        try:
+            loan = self.get(pk=loan_id)
+            payments = Payment.objects.filter(loan_id=loan_id, type='MD', date__lte=date_base)
+            return loan.amount - sum([pay.amount for pay in payments])
+        except:
+            return Decimal('0') 
 
 
 class Loan(models.Model):
@@ -35,7 +43,6 @@ class Loan(models.Model):
         r = self.rate / 12
         self.installment = (r + r / ((1 + r) ** self.term - 1)) * self.amount
         return self.save()
-
 
 class Payment(models.Model):
     """
