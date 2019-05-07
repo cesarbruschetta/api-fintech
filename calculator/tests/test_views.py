@@ -25,8 +25,8 @@ class CreateNewLoanTest(TestCase):
             data=json.dumps(valid_payload),
             content_type='application/json'
         )
-        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data, {'id': '1', 'installment': 85.60})
 
     def test_create_invalid_term_loan(self):
         invalid_payload = {
