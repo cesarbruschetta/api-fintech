@@ -12,7 +12,7 @@ def post_loans(request):
     data = {
         'amount': request.data.get('amount'),
         'term': request.data.get('term'),
-        'rate': request.data.get('term'),
+        'rate': request.data.get('rate'),
         'date_initial': request.data.get('date')
     }
     serializer = LoanSerializer(data=data)
