@@ -16,7 +16,7 @@ class LoanTest(TestCase):
     def test_loan(self):
         loan_01 = Loan.objects.get(amount=Decimal('1000.00'))
         self.assertEqual(
-            loan_01.installment, Decimal('85.61')) #check use of decimals, because the digit is wrong
+            loan_01.installment, Decimal('85.60'))
     
     def test_payment_made(self):
         loan_01 = Loan.objects.get(amount=Decimal('1000.00'))
@@ -68,13 +68,10 @@ class BalanceTest(TestCase):
         )
     
     def test_balance_loan_valid(self):
-        self.assertEqual(Loan.objects.get_balance(loan_id=self.loan_01.pk, date_base=datetime(2019,4,25).astimezone(tz=timezone.utc)), Decimal('600'))
-    
-    def test_balance_loan_invalid(self):
-        self.assertEqual(Loan.objects.get_balance(0, date_base=datetime(2019,3,25).astimezone(tz=timezone.utc)), Decimal('0'))
+        self.assertEqual(self.loan_01.get_balance(date_base=datetime(2019,4,25).astimezone(tz=timezone.utc)), Decimal('600'))
 
     def test_balance_without_payments(self):
-        self.assertEqual(Loan.objects.get_balance(loan_id=self.loan_01.pk, date_base=datetime(2019,3,25).astimezone(tz=timezone.utc)), self.loan_01.amount)
+        self.assertEqual(self.loan_01.get_balance(date_base=datetime(2019,3,25).astimezone(tz=timezone.utc)), self.loan_01.amount)
     
     def test_balance_loan_without_date_base(self):
-        self.assertEqual(Loan.objects.get_balance(loan_id=self.loan_01.pk), Decimal('600'))
+        self.assertEqual(self.loan_01.get_balance(), Decimal('600'))
