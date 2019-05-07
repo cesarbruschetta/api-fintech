@@ -1,19 +1,7 @@
 from django.contrib.postgres.validators import RangeMinValueValidator
 from django.db import models
-from decimal import Decimal
+from decimal import Decimal, ROUND_DOWN
 from datetime import datetime, timezone
-
-
-class LoanManager(models.Manager):
-
-    def get_balance(self, loan_id, date_base=datetime.now().astimezone(tz=timezone.utc)):
-        try:
-            loan = self.get(pk=loan_id)
-            payments = Payment.objects.filter(loan_id=loan_id, type='MD', date__lte=date_base)
-            return loan.amount - sum([pay.amount for pay in payments])
-        except:
-            return Decimal('0') 
-
 
 class Loan(models.Model):
     """
@@ -33,8 +21,6 @@ class Loan(models.Model):
                                 RangeMinValueValidator(Decimal('0.01'))
                                ])
     date_initial = models.DateTimeField('Date creation', auto_now=False, auto_now_add=False)
-    installment = models.DecimalField('Installment', max_digits=15, decimal_places=2,default=Decimal('0000000000000.00'))
-    objects = LoanManager()
 
     class Meta:
         verbose_name = 'Loan'
@@ -42,14 +28,19 @@ class Loan(models.Model):
 
     def __str__(self):
         return str(self.pk)
-
-    def get_absolute_url(self):
-        return reverse("_detail", kwargs={"pk": self.pk})
     
-    def save(self, *args, **kwargs):
+    @property
+    def installment(self):
         r = self.rate / 12
-        self.installment = (r + r / ((1 + r) ** self.term - 1)) * self.amount
-        super(Loan, self).save(*args, **kwargs)
+        installment = (r + r / ((1 + r) ** self.term - 1)) * self.amount
+        return installment.quantize(Decimal('.01'), rounding=ROUND_DOWN)
+    
+    def get_balance(self, date_base=datetime.now().astimezone(tz=timezone.utc)):
+        try:
+            payments = self.payment_set.filter(type='MD', date__lte=date_base).values('amount')
+            return self.amount - sum([payment['amount'] for payment in payments])
+        except:
+            return Decimal('0')
 
 
 class Payment(models.Model):
@@ -73,5 +64,3 @@ class Payment(models.Model):
     def __str__(self):
         return str(self.pk)
 
-    def get_absolute_url(self):
-        return reverse("_detail", kwargs={"pk": self.pk})
