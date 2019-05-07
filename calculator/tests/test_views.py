@@ -67,3 +67,17 @@ class CreateNewLoanTest(TestCase):
             content_type='application/json'
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    def test_create_invalid_rate_loan(self):
+        invalid_payload = {
+            "amount": 1000,
+            "term": 1,
+            "rate": 0,
+            "date": "2019-05-09 03:18Z"
+        }
+        response = client.post(
+            reverse('post_loans'),
+            data=json.dumps(invalid_payload),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
