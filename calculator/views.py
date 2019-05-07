@@ -5,7 +5,7 @@ from decimal import Decimal
 from datetime import datetime
 
 from .models import Loan
-from .serializers import LoanSerializer
+from .serializers import LoanSerializer, PaymentSerializer
 
 @api_view(['POST'])
 def post_loans(request):
@@ -16,6 +16,20 @@ def post_loans(request):
         'date_initial': request.data.get('date')
     }
     serializer = LoanSerializer(data=data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def post_payments(request, pk):
+    print(pk)
+    data = {
+        'type': request.data.get('payment'),
+        'date': request.data.get('date'),
+        'amount': request.data.get('amount')
+    }
+    serializer = PaymentSerializer(data=data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
