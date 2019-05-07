@@ -23,8 +23,13 @@ def post_loans(request):
 
 @api_view(['POST'])
 def post_payments(request, pk):
-    print(pk)
+    try:
+        Loan.objects.get(pk=pk)
+    except Loan.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+ 
     data = {
+        'loan_id': pk,
         'type': request.data.get('payment'),
         'date': request.data.get('date'),
         'amount': request.data.get('amount')
@@ -34,3 +39,4 @@ def post_payments(request, pk):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+ 

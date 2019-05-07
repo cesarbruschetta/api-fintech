@@ -30,6 +30,19 @@ class RegisterPaymentTest(TestCase):
             reverse('post_payments', kwargs={'pk': self.loan.pk}),
             data=json.dumps(valid_payload),
             content_type='application/json'
-        )
-        print(response.data)
+        )        
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data, {})
+    
+    def test_register_payment_without_loan(self):
+        valid_payload = {
+            "payment": "made",
+            "amount": 100,
+            "date": "2019-05-09 03:18Z"
+        }
+        response = client.post(
+            reverse('post_payments', kwargs={'pk': 5}),
+            data=json.dumps(valid_payload),
+            content_type='application/json'
+        )        
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

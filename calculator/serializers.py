@@ -20,3 +20,6 @@ class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
         fields = '__all__'
+    
+    def to_representation(self, obj):
+        return {}
