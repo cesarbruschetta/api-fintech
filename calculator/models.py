@@ -5,10 +5,6 @@ from datetime import datetime, timezone
 
 
 class LoanManager(models.Manager):
-    def create_loan(self, *args, **kwargs):
-        loan = self.create(*args, **kwargs)
-        loan.save_installment()
-        return loan
 
     def get_balance(self, loan_id, date_base=datetime.now().astimezone(tz=timezone.utc)):
         try:
@@ -49,11 +45,11 @@ class Loan(models.Model):
 
     def get_absolute_url(self):
         return reverse("_detail", kwargs={"pk": self.pk})
-
-    def save_installment(self):
+    
+    def save(self, *args, **kwargs):
         r = self.rate / 12
         self.installment = (r + r / ((1 + r) ** self.term - 1)) * self.amount
-        return self.save()
+        super(Loan, self).save(*args, **kwargs)
 
 
 class Payment(models.Model):
