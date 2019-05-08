@@ -46,3 +46,41 @@ class RegisterPaymentTest(TestCase):
             content_type='application/json'
         )        
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+    
+    def test_register_payment_without_type(self):
+        valid_payload = {
+            "payment": "",
+            "amount": 100,
+            "date": "2019-05-09 03:18Z"
+        }
+        response = client.post(
+            reverse('post_payments', kwargs={'pk': self.loan.pk}),
+            data=json.dumps(valid_payload),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_register_payment_without_amount(self):
+        valid_payload = {
+            "payment": "made",
+            "date": "2019-05-09 03:18Z"
+        }
+        response = client.post(
+            reverse('post_payments', kwargs={'pk': self.loan.pk}),
+            data=json.dumps(valid_payload),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_register_payment_without_date(self):
+        valid_payload = {
+            "payment": "made",
+            "amount": 100,
+            "date": ""
+        }
+        response = client.post(
+            reverse('post_payments', kwargs={'pk': self.loan.pk}),
+            data=json.dumps(valid_payload),
+            content_type='application/json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
