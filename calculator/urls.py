@@ -5,7 +5,7 @@ from . import views
 urlpatterns = [
     url(
         r'^v1/loans/$',
-        views.post_loans,
+        views.LoanView.as_view(),
         name='post_loans'
     ),
     url(

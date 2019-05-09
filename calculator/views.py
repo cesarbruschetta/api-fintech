@@ -1,6 +1,11 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
 from rest_framework import status
+from rest_framework.generics import (
+    ListCreateAPIView,
+    RetrieveUpdateDestroyAPIView
+)
 from decimal import Decimal
 from datetime import datetime
 
@@ -8,20 +13,15 @@ from .models import Loan
 from .serializers import LoanSerializer, PaymentSerializer, BalanceSerializer
 
 
-@api_view(['POST'])
-def post_loans(request):
-    data = {
-        'amount': request.data.get('amount'),
-        'term': request.data.get('term'),
-        'rate': request.data.get('rate'),
-        'date_initial': request.data.get('date')
-    }
-    serializer = LoanSerializer(data=data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class LoanView(ListCreateAPIView):
+    queryset = Loan.objects.all()
+    serializer_class = LoanSerializer
 
+    def performe_create(self, serializer):
+        loan = get_object_or_404(
+            Loan, id=self.request.data.get('loan_id')
+        )
+        return serializer.save(loan=loan)
 
 @api_view(['POST'])
 def post_payments(request, pk):
