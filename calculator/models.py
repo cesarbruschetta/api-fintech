@@ -20,7 +20,7 @@ class Loan(models.Model):
                                validators=[
                                 RangeMinValueValidator(Decimal('0.01'))
                                ])
-    date_initial = models.DateTimeField('Date creation', auto_now=False, auto_now_add=False)
+    date = models.DateTimeField('Date creation', auto_now=False, auto_now_add=False)
 
     class Meta:
         verbose_name = 'Loan'

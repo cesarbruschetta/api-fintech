@@ -17,7 +17,7 @@ class RegisterPaymentTest(TestCase):
 
     def setUp(self):
         self.loan = Loan.objects.create(
-            amount=Decimal('1000.00'), term=12, rate=Decimal('0.05'), date_initial=datetime(2019,3,24,11,30).astimezone(tz=timezone.utc)
+            amount=Decimal('1000.00'), term=12, rate=Decimal('0.05'), date=datetime(2019,3,24,11,30).astimezone(tz=timezone.utc)
         )
 
     def test_register_valid_payment(self):
