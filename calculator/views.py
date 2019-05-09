@@ -32,7 +32,7 @@ def post_payments(request, pk):
  
     data = {
         'loan_id': pk,
-        'type': request.data.get('payment'),
+        'payment': request.data.get('payment'),
         'date': request.data.get('date'),
         'amount': request.data.get('amount')
     }

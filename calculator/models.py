@@ -37,7 +37,7 @@ class Loan(models.Model):
     
     def get_balance(self, date_base=datetime.now().astimezone(tz=timezone.utc)):
         try:
-            payments = self.payment_set.filter(type='made', date__lte=date_base).values('amount')
+            payments = self.payment_set.filter(payment='made', date__lte=date_base).values('amount')
             return self.amount - sum([payment['amount'] for payment in payments])
         except:
             return Decimal('0')
@@ -50,7 +50,7 @@ class Payment(models.Model):
     """
     loan_id = models.ForeignKey('Loan', on_delete=models.CASCADE)
     PAYMENT_CHOICES = (('made', 'made'), ('missed', 'missed'))
-    type = models.CharField('Type', max_length=2, choices=PAYMENT_CHOICES)
+    payment = models.CharField('Payment Type', max_length=2, choices=PAYMENT_CHOICES, default='made')
     date = models.DateTimeField('Date', auto_now=False, auto_now_add=False)
     amount = models.DecimalField('Amount', max_digits=15, decimal_places=2,
                                  validators=[
