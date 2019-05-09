@@ -61,7 +61,6 @@ class Loan(models.Model):
         verbose_name = 'Loan'
         verbose_name_plural = 'Loans'
 
-
         def __repr__(self):
             return f'Loan(loan_id={self.loan_id}, amount={self.amount}, term={self.term}, rate={self.rate}, date={self.date_initial})'
 
