@@ -5,7 +5,7 @@ from decimal import Decimal
 from datetime import datetime
 
 from .models import Loan
-from .serializers import LoanSerializer, PaymentSerializer
+from .serializers import LoanSerializer, PaymentSerializer, BalanceSerializer
 
 
 @api_view(['POST'])
@@ -46,13 +46,13 @@ def post_payments(request, pk):
 @api_view(['GET'])
 def get_balance(request, pk):
     try:
-        loan = Loan.objects.get(pk=pk)
+        Loan.objects.get(pk=pk)
     except Loan.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     
-    date_base = request.query_params.get('date')
-    if date_base:
-        balance = loan.get_balance(date_base)
-    else:
-        balance = loan.get_balance()
-    return Response({'balance': balance}, status=status.HTTP_200_OK)
+    serializer = BalanceSerializer(data={'date': request.query_params.get('date'), 'loan_id': pk})
+    if serializer.is_valid():
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
