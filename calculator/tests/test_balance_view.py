@@ -46,14 +46,14 @@ class BalanceViewTest(TestCase):
     
     def test_get_balance_invalid_date(self):
         valid_payload = {
-            "date": "XPTO"
+            "date": ""
         }
         response = client.get(
             reverse('get_balance', kwargs={'pk': self.loan.pk}),
             valid_payload
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-    
+
     def test_get_balance_invalid_loan(self):
         response = client.get(
             reverse('get_balance', kwargs={'pk': 850})
