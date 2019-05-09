@@ -7,6 +7,7 @@ from datetime import datetime
 from .models import Loan
 from .serializers import LoanSerializer, PaymentSerializer
 
+
 @api_view(['POST'])
 def post_loans(request):
     data = {
@@ -20,6 +21,7 @@ def post_loans(request):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['POST'])
 def post_payments(request, pk):
@@ -39,4 +41,18 @@ def post_payments(request, pk):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
- 
+
+
+@api_view(['GET'])
+def get_balance(request, pk):
+    try:
+        loan = Loan.objects.get(pk=pk)
+    except Loan.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    
+    date_base = request.query_params.get('date')
+    if date_base:
+        balance = loan.get_balance(date_base)
+    else:
+        balance = loan.get_balance()
+    return Response({'balance': balance}, status=status.HTTP_200_OK)
