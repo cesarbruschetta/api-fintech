@@ -8,15 +8,15 @@ class Client(models.Model):
     name = models.CharField('Name', max_length=15)
     surname = models.CharField('Last name', max_length=15)
     email = models.EmailField('E-mail')
-    phone = models.BigIntegerField('Phone', max_length=15)
-    cpf = models.BigIntegerField('CPF', max_length=11)
+    phone = models.BigIntegerField('Phone')
+    cpf = models.BigIntegerField('CPF')
 
     class Meta:
         verbose_name = 'Client'
         verbose_name_plural = 'Clients'
 
-    def __str__(self):
-        return f'id {self.pf}-{self.name}{self.surname}'
+    def __repr__(self):
+        return f'Client(id={self.pf}, name={self.name}, surname={self.surname}, email={self.email}, phone={self.phone}, cpf={self.cpf}'
 
 
 class Loan(models.Model):
@@ -61,11 +61,9 @@ class Loan(models.Model):
         verbose_name = 'Loan'
         verbose_name_plural = 'Loans'
 
-        def __str__(self):
-            return str(self.pk)
 
         def __repr__(self):
-            return f'Payment(loan_id={self.loan_id}, type={self.status}, date={date}, amount={amount})'
+            return f'Loan(loan_id={self.loan_id}, amount={self.amount}, term={self.term}, rate={self.rate}, date={self.date_initial})'
 
 
 class Payment(models.Model):
@@ -83,8 +81,6 @@ class Payment(models.Model):
         verbose_name = 'Payment'
         verbose_name_plural = 'Payments'
 
-    def __str__(self):
-        return str(self.pk)
 
     def __repr__(self):
-        return f'Payment(loan_id={self.loan_id}, type={self.status}, date={date}, amount={amount})'
+        return f'Payment(loan_id={self.loan_id}, type={self.status}, date={self.date}, amount={self.amount})'
