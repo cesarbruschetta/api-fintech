@@ -2,7 +2,6 @@ from django.contrib.postgres.validators import RangeMinValueValidator
 from django.db import models
 from decimal import Decimal, ROUND_DOWN
 from datetime import datetime, timezone
-from copy import deepcopy
 from django.forms import DecimalField
 from django.core.validators import MaxValueValidator, MinValueValidator
 
@@ -39,7 +38,7 @@ class Loan(models.Model):
     rate = models.DecimalField('Rate', max_digits=15, decimal_places=2, validators=[MinValueValidator(0.01)])
     date_initial = models.DateTimeField('Date creation', auto_now=False, auto_now_add=False)
 
-    def installment_adjustment(self):
+    def _instalment_adjustment(self):
         loans_history = self.client.loan_set.all()
         missed_payments = sum([Payment.objects.filter(loan_id=loan, status='MS').count() for loan in loans_history])
         if len(loans_history) > 1:
@@ -54,10 +53,10 @@ class Loan(models.Model):
         return Decimal(0)
 
     @property
-    def installment(self):
+    def instalment(self):
         r = self.rate / self.term
-        installment = (r + r / ((1 + r) ** self.term - 1)) * self.amount * (1 + self.installment_adjustment())
-        return installment.quantize(Decimal('.01'), rounding=ROUND_DOWN)
+        instalment = (r + r / ((1 + r) ** self.term - 1)) * self.amount * (1 + self.instalment_adjustment())
+        return instalment.quantize(Decimal('.01'), rounding=ROUND_DOWN)
     
     def get_balance(self, date_base=datetime.now().astimezone(tz=timezone.utc)):
         try:
@@ -83,14 +82,15 @@ class Payment(models.Model):
     Payment Model
     Defines the attributes of a Payment
     """
-    loan_id = models.ForeignKey(Loan, on_delete=models.CASCADE)
     PAYMENT_CHOICES = (('MD', 'Made'), ('MS', 'Missed'))
+
+    loan_id = models.ForeignKey(Loan, on_delete=models.CASCADE)
     status = models.CharField('Type', db_column='type', max_length=2, choices=PAYMENT_CHOICES, default='MD')
     date = models.DateTimeField('Date', auto_now=False, auto_now_add=False)
     amount = models.DecimalField('Amount', max_digits=15, decimal_places=2)
 
     def __repr__(self):
-        return f'Payment(loan_id={self.loan_id}, type={self.status}, date={self.date}, amount={self.amount})'
+        return f'Payment(loan_id={self.loan_id}, type={self.status}, date={self.date}, amount={self.amount})' #555555555555555555555
     
     class Meta:
         verbose_name = 'Payment'
