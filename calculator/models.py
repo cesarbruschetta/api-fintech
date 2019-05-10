@@ -15,7 +15,7 @@ class Client(models.Model):
 
     def __repr__(self):
         return f'Client(id={self.id}, name={self.name}, surname={self.surname}, email={self.email}, phone={self.phone}, cpf={self.cpf})'
-        
+
     def __str__(self):
         return f'{self.name}'
 
@@ -90,9 +90,8 @@ class Payment(models.Model):
     amount = models.DecimalField('Amount', max_digits=15, decimal_places=2)
 
     def __repr__(self):
-        return f'Payment(loan_id={self.loan_id}, type={self.status}, date={self.date}, amount={self.amount})' #555555555555555555555
-    
+        return f'Payment(loan_id={self.loan_id}, type={self.status}, date={self.date}, amount={self.amount})'
+
     class Meta:
         verbose_name = 'Payment'
         verbose_name_plural = 'Payments'
-
