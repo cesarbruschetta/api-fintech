@@ -10,7 +10,7 @@ urlpatterns = [
     ),
     url(
         r'^v1/loans/(?P<pk>[0-9]+)/payments$',
-        views.post_payments,
+        views.PaymentView.as_view(),
         name='post_payments'
     ),
     url(

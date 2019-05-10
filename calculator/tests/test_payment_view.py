@@ -45,6 +45,7 @@ class RegisterPaymentTest(TestCase):
             data=json.dumps(valid_payload),
             content_type='application/json'
         )        
+        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
     
     def test_register_payment_without_type(self):

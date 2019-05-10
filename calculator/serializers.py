@@ -20,8 +20,8 @@ class LoanSerializer(serializers.ModelSerializer):
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
-        fields = '__all__'
-    
+        fields = ('payment', 'date', 'amount', 'loan_id')
+
     def to_representation(self, obj):
         return {}
 

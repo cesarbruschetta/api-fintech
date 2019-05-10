@@ -20,10 +20,10 @@ class BalanceViewTest(TestCase):
             amount=Decimal('1000.00'), term=12, rate=Decimal('0.05'), date=datetime(2019,3,24,11,30).astimezone(tz=timezone.utc)
         )
         Payment.objects.create(
-            loan_id=self.loan, payment='made', date=datetime(2019,4,24).astimezone(tz=timezone.utc), amount=Decimal('200')
+            loan=self.loan, payment='made', date=datetime(2019,4,24).astimezone(tz=timezone.utc), amount=Decimal('200')
         )
         Payment.objects.create(
-            loan_id=self.loan, payment='made', date=datetime(2019,5,24).astimezone(tz=timezone.utc), amount=Decimal('200')
+            loan=self.loan, payment='made', date=datetime(2019,5,24).astimezone(tz=timezone.utc), amount=Decimal('200')
         )
 
     def test_get_balance(self):

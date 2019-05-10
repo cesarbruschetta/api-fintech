@@ -4,12 +4,13 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.generics import (
     ListCreateAPIView,
-    RetrieveUpdateDestroyAPIView
+    RetrieveUpdateDestroyAPIView,
+    CreateAPIView
 )
 from decimal import Decimal
 from datetime import datetime
 
-from .models import Loan
+from .models import Loan, Payment
 from .serializers import LoanSerializer, PaymentSerializer, BalanceSerializer
 
 
@@ -17,12 +18,23 @@ class LoanView(ListCreateAPIView):
     queryset = Loan.objects.all()
     serializer_class = LoanSerializer
 
+
+class PaymentView(ListCreateAPIView):    
+    serializer_class = PaymentSerializer
+
+    def get_queryset(self):
+        loan = get_object_or_404(
+            Loan, id=self.kwargs['pk']
+        )
+        return Payment.objects.filter(loan_id=loan.pk)
+
     def performe_create(self, serializer):
         loan = get_object_or_404(
-            Loan, id=self.request.data.get('loan_id')
+            Loan, id=self.kwargs['pk']
         )
-        return serializer.save(loan=loan)
+        return serializer.save(loan=loan.pk)
 
+"""
 @api_view(['POST'])
 def post_payments(request, pk):
     try:
@@ -41,7 +53,7 @@ def post_payments(request, pk):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+"""
 
 @api_view(['GET'])
 def get_balance(request, pk):

@@ -21,7 +21,7 @@ class LoanTest(TestCase):
     def test_payment_made(self):
         loan_01 = Loan.objects.get(amount=Decimal('1000.00'))
         Payment.objects.create(
-            loan_id=loan_01, payment='made', date=datetime(2019,4,24).astimezone(tz=timezone.utc), amount=Decimal('100')
+            loan=loan_01, payment='made', date=datetime(2019,4,24).astimezone(tz=timezone.utc), amount=Decimal('100')
         )
         payment = Payment.objects.get(payment='made')
         self.assertEqual(
@@ -30,7 +30,7 @@ class LoanTest(TestCase):
     def test_payment_missed(self):
         loan_01 = Loan.objects.get(amount=Decimal('1000.00'))
         Payment.objects.create(
-            loan_id=loan_01, payment='MS', date=datetime(2019,4,24).astimezone(tz=timezone.utc), amount=Decimal('200')
+            loan=loan_01, payment='MS', date=datetime(2019,4,24).astimezone(tz=timezone.utc), amount=Decimal('200')
         )
         payment = Payment.objects.get(payment='MS')
         self.assertEqual(
@@ -43,7 +43,7 @@ class LoanTest(TestCase):
     def test_payment_error(self):
         loan_01 = Loan.objects.get(amount=Decimal('1000.00'))
         Payment.objects.create(
-            loan_id=loan_01, payment='0', date=datetime(2019,4,24).astimezone(tz=timezone.utc), amount=Decimal('300')
+            loan=loan_01, payment='0', date=datetime(2019,4,24).astimezone(tz=timezone.utc), amount=Decimal('300')
         )
         payment = Payment.objects.get(payment='0')
         self.assertEqual(
@@ -58,13 +58,13 @@ class BalanceTest(TestCase):
             amount=Decimal('1000.00'), term=12, rate=Decimal('0.05'), date=datetime(2019,3,24,11,30).astimezone(tz=timezone.utc)
         )
         Payment.objects.create(
-            loan_id=self.loan_01, payment='made', date=datetime(2019,4,24).astimezone(tz=timezone.utc), amount=Decimal('200')
+            loan=self.loan_01, payment='made', date=datetime(2019,4,24).astimezone(tz=timezone.utc), amount=Decimal('200')
         )
         Payment.objects.create(
-            loan_id=self.loan_01, payment='made', date=datetime(2019,4,24).astimezone(tz=timezone.utc), amount=Decimal('200')
+            loan=self.loan_01, payment='made', date=datetime(2019,4,24).astimezone(tz=timezone.utc), amount=Decimal('200')
         )
         Payment.objects.create(
-            loan_id=self.loan_01, payment='MS', date=datetime(2019,4,24).astimezone(tz=timezone.utc), amount=Decimal('200')
+            loan=self.loan_01, payment='MS', date=datetime(2019,4,24).astimezone(tz=timezone.utc), amount=Decimal('200')
         )
     
     def test_balance_loan_valid(self):

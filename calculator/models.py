@@ -48,7 +48,7 @@ class Payment(models.Model):
     Payment Model
     Defines the attributes of a Payment
     """
-    loan_id = models.ForeignKey('Loan', on_delete=models.CASCADE)
+    loan = models.ForeignKey('Loan', on_delete=models.CASCADE)
     PAYMENT_CHOICES = (('made', 'made'), ('missed', 'missed'))
     payment = models.CharField('Payment Type', max_length=2, choices=PAYMENT_CHOICES, default='made')
     date = models.DateTimeField('Date', auto_now=False, auto_now_add=False)
