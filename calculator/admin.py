@@ -7,7 +7,7 @@ class ClientAdmin(admin.ModelAdmin):
 
 
 class LoanAdmin(admin.ModelAdmin):
-    list_display = ('id', 'client', 'amount', 'term', 'rate', 'date_initial', 'installment')
+    list_display = ('id', 'client', 'amount', 'term', 'rate', 'date_initial')
 
 
 class PaymentAdmin(admin.ModelAdmin):
