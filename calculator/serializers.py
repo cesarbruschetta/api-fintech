@@ -9,11 +9,11 @@ class LoanSerializer(serializers.ModelSerializer):
     class Meta:
         model = Loan
         fields = ('__all__')
-
+    
     def to_representation(self, obj):
         return {
             'id': str(obj.id),
-            'installment': round(float(obj.installment), 2)
+            'installment': round(float(obj.instalment), 2)
         }
 
 

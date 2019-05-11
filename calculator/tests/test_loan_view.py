@@ -1,26 +1,35 @@
 import json
+import unittest
 from rest_framework import status
-from django.test import TestCase, Client
+from django.test import TestCase
 from django.urls import reverse
-from ..models import Loan
+from ..models import Loan, Client
 from ..serializers import LoanSerializer
-
-
-# initialize the APIClient app
-client = Client()
 
 
 class CreateNewLoanTest(TestCase):
     """ Test module for inserting a new Loan """
+
+    @classmethod
+    def setUpClass(cls):
+        super(CreateNewLoanTest, cls).setUpClass()
+        cls.client_1 = Client.objects.create(
+            name="Ian Marcos",
+            surname="Carvalho",
+            email="ianmarcoscarvalho@gmail.com.br",
+            phone="9137946863",
+            cpf="51281103891",
+        )
 
     def test_create_valid_loan(self):
         valid_payload = {
             "amount": 1000,
             "term": 12,
             "rate": 0.05,
-            "date": "2019-05-09 03:18Z"
+            "date": "2019-05-09 03:18Z",
+            "client_id": self.client_1.pk
         }
-        response = client.post(
+        response = self.client.post(
             reverse('post_loans'),
             data=json.dumps(valid_payload),
             content_type='application/json'
@@ -35,7 +44,7 @@ class CreateNewLoanTest(TestCase):
             "rate": 0.05,
             "date": "2019-05-09 03:18Z"
         }
-        response = client.post(
+        response = self.client.post(
             reverse('post_loans'),
             data=json.dumps(invalid_payload),
             content_type='application/json'
@@ -48,7 +57,7 @@ class CreateNewLoanTest(TestCase):
             "rate": 0.05,
             "date": "2019-05-09 03:18Z"
         }
-        response = client.post(
+        response = self.client.post(
             reverse('post_loans'),
             data=json.dumps(invalid_payload),
             content_type='application/json'
@@ -61,7 +70,7 @@ class CreateNewLoanTest(TestCase):
             "term": 1,
             "rate": 0.05
         }
-        response = client.post(
+        response = self.client.post(
             reverse('post_loans'),
             data=json.dumps(invalid_payload),
             content_type='application/json'
@@ -75,7 +84,7 @@ class CreateNewLoanTest(TestCase):
             "rate": 0,
             "date": "2019-05-09 03:18Z"
         }
-        response = client.post(
+        response = self.client.post(
             reverse('post_loans'),
             data=json.dumps(invalid_payload),
             content_type='application/json'

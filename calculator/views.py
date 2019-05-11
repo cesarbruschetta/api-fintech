@@ -4,17 +4,23 @@ from rest_framework import status
 from decimal import Decimal
 from datetime import datetime
 
-from .models import Loan
+from .models import Loan, Client
 from .serializers import LoanSerializer, PaymentSerializer, BalanceSerializer
 
 
 @api_view(['POST'])
 def post_loans(request):
+    try:
+        Client.objects.get(pk=request.data.get('client_id'))
+    except Client.DoesNotExist:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
     data = {
         'amount': request.data.get('amount'),
         'term': request.data.get('term'),
         'rate': request.data.get('rate'),
-        'date_initial': request.data.get('date')
+        'date_initial': request.data.get('date'),
+        'client': request.data.get('client_id')
     }
     serializer = LoanSerializer(data=data)
     if serializer.is_valid():
@@ -32,7 +38,7 @@ def post_payments(request, pk):
  
     data = {
         'loan_id': pk,
-        'type': request.data.get('payment'),
+        'status': request.data.get('payment'),
         'date': request.data.get('date'),
         'amount': request.data.get('amount')
     }
