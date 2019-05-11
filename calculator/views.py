@@ -5,8 +5,15 @@ from decimal import Decimal
 from datetime import datetime
 
 from .models import Loan, Client
-from .serializers import LoanSerializer, PaymentSerializer, BalanceSerializer
+from .serializers import LoanSerializer, PaymentSerializer, BalanceSerializer, ClientSerializer
 
+@api_view(['POST'])
+def post_clients(request):
+    serializer = ClientSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def post_loans(request):

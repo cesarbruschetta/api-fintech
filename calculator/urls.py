@@ -4,6 +4,11 @@ from . import views
 
 urlpatterns = [
     url(
+        r'^v1/clients/$',
+        views.post_clients,
+        name='post_clients'
+    ),
+    url(
         r'^v1/loans/$',
         views.post_loans,
         name='post_loans'
