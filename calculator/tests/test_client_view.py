@@ -6,7 +6,7 @@ from django.urls import reverse
 from ..models import Client
 
 
-class CreateNewLoanTest(TestCase):
+class CreateNewClientTest(TestCase):
     """ Test module for inserting a new Client """
 
     def test_create_valid_client(self):
