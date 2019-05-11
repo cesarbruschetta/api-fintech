@@ -15,8 +15,8 @@ class ClientTest(TestCase):
             name="Ian Marcos",
             surname="Carvalho",
             email="ianmarcoscarvalho@gmail.com.br",
-            telephone="(91) 3794-6863",
-            cpf="512.811.038-96",
+            phone="9137946863",
+            cpf="51281103896",
         )
 
     def test_client(self):
@@ -35,8 +35,8 @@ class LoanTest(TestCase):
             name="Ian Marcos",
             surname="Carvalho",
             email="ianmarcoscarvalho@gmail.com.br",
-            telephone="(91) 3794-6863",
-            cpf="204.421.210-24",
+            phone="9137946863",
+            cpf="20442121024",
         )
         Loan.objects.create(
             client=client,
@@ -50,41 +50,41 @@ class LoanTest(TestCase):
         self.loan_01 = Loan.objects.get(amount=Decimal("1001.00"))
 
     def test_loan(self):
-        self.assertEqual(self.loan_01.installment, Decimal("85.69"))
+        self.assertEqual(self.loan_01.instalment, Decimal("85.69"))
 
     def test_payment_made(self):
         Payment.objects.create(
             loan_id=self.loan_01,
-            type="MD",
+            status="MD",
             date=datetime(2019, 4, 24).astimezone(tz=timezone.utc),
             amount=Decimal("100"),
         )
-        payment = Payment.objects.get(type="MD")
+        payment = Payment.objects.get(status="MD")
         self.assertEqual(payment.amount, Decimal("100"))
 
     def test_payment_missed(self):
         Payment.objects.create(
             loan_id=self.loan_01,
-            type="MS",
+            status="MS",
             date=datetime(2019, 4, 24).astimezone(tz=timezone.utc),
             amount=Decimal("200"),
         )
-        payment = Payment.objects.get(type="MS", loan_id=self.loan_01)
+        payment = Payment.objects.get(status="MS", loan_id=self.loan_01)
         self.assertEqual(payment.amount, Decimal("200"))
 
     """
-        This test should failure, because 0 is not a option type.
+        This test should failure, because 0 is not a option status.
         Search a way to do this.
     """
 
     def test_payment_error(self):
         Payment.objects.create(
             loan_id=self.loan_01,
-            type="0",
+            status="0",
             date=datetime(2019, 4, 24).astimezone(tz=timezone.utc),
             amount=Decimal("300"),
         )
-        payment = Payment.objects.get(type="0", loan_id=self.loan_01)
+        payment = Payment.objects.get(status="0", loan_id=self.loan_01)
         self.assertEqual(payment.amount, Decimal("300"))
 
 
@@ -99,8 +99,8 @@ class BalanceTest(TestCase):
             name="Ian Marcos",
             surname="Carvalho",
             email="ianmarcoscarvalho@gmail.com.br",
-            telephone="(91) 3794-6863",
-            cpf="496.034.860-78",
+            phone="9137946863",
+            cpf="49603486078",
         )
 
         cls.loan_01 = Loan.objects.create(
@@ -112,19 +112,19 @@ class BalanceTest(TestCase):
         )
         Payment.objects.create(
             loan_id=cls.loan_01,
-            type="MD",
+            status="MD",
             date=datetime(2019, 4, 24).astimezone(tz=timezone.utc),
             amount=Decimal("200"),
         )
         Payment.objects.create(
             loan_id=cls.loan_01,
-            type="MD",
+            status="MD",
             date=datetime(2019, 4, 24).astimezone(tz=timezone.utc),
             amount=Decimal("200"),
         )
         Payment.objects.create(
             loan_id=cls.loan_01,
-            type="MS",
+            status="MS",
             date=datetime(2019, 4, 24).astimezone(tz=timezone.utc),
             amount=Decimal("200"),
         )
