@@ -31,7 +31,6 @@ class Loan(models.Model):
     Loan Model
     Defines the attributes of a loan
     """
-
     client = models.ForeignKey(Client, on_delete=models.DO_NOTHING)
     amount = models.DecimalField(
         "Amount", max_digits=15, decimal_places=2, validators=[MinValueValidator(Decimal("0.01"))]
@@ -77,10 +76,8 @@ class Loan(models.Model):
 
     def get_balance(self, date_base=datetime.now().astimezone(tz=timezone.utc)):
         try:
-            payments = self.payment_set.filter(status="MD", date__lte=date_base).values(
-                "amount"
-            )
-            return self.amount - sum([payment["amount"] for payment in payments])
+            payments = self.payment_set.filter(status='made', date__lte=date_base).values('amount')
+            return self.amount - sum([payment['amount'] for payment in payments])
         except:
             return Decimal("0")
 
@@ -97,19 +94,19 @@ class Payment(models.Model):
     Payment Model
     Defines the attributes of a Payment
     """
+    PAYMENT_CHOICES = (('made', 'made'), ('missed', 'missed'))
 
-    PAYMENT_CHOICES = (("MD", "Made"), ("MS", "Missed"))
-
-    loan_id = models.ForeignKey(Loan, on_delete=models.CASCADE)
-    status = models.CharField(
-        "Type", max_length=2, choices=PAYMENT_CHOICES, default="MD"
-    )
-    date = models.DateTimeField("Date", auto_now=False, auto_now_add=False)
-    amount = models.DecimalField("Amount", max_digits=15, decimal_places=2, validators=[MinValueValidator(Decimal("0.01"))])
+    loan_id = models.ForeignKey('Loan', on_delete=models.CASCADE)
+    status = models.CharField('status', db_column='type', max_length=2, choices=PAYMENT_CHOICES)
+    date = models.DateTimeField('Date', auto_now=False, auto_now_add=False)
+    amount = models.DecimalField('Amount', max_digits=15, decimal_places=2,
+                                 validators=[
+                                    MinValueValidator(Decimal("0.01"))
+                                 ])
 
     class Meta:
         verbose_name = "Payment"
         verbose_name_plural = "Payments"
 
     def __str__(self):
-        return f"Payment(loan_id={self.loan_id}, type={self.status}, date={self.date}, amount={self.amount})"
+        return f"Payment(loan_id={self.loan_id}, status={self.status}, date={self.date}, amount={self.amount})"
