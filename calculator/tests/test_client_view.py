@@ -20,22 +20,21 @@ class CreateNewClientTest(TestCase):
         response = self.client.post(
             reverse('clients'),
             data=json.dumps(valid_payload),
-            content_type='application/json'
+            content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data, {'client_id': '1'})
+        self.assertEqual(response.data, {"client_id": "1"})
 
     def test_create_invalid_client(self):
         invalid_payload = {
             "name": "Ian Marcos",
             "surname": "Carvalho",
             "email": "ianmarcoscarvalho@gmail.com.br",
-            "phone": "9137946863"
+            "phone": "9137946863",
         }
         response = self.client.post(
             reverse('clients'),
             data=json.dumps(invalid_payload),
-            content_type='application/json'
+            content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-    
