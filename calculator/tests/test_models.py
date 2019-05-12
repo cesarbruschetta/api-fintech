@@ -5,6 +5,7 @@ from decimal import Decimal
 
 from ..models import Loan, Payment, Client
 
+
 class ClientTest(TestCase):
     """ Test module for Client model """
 
@@ -124,7 +125,7 @@ class BalanceTest(TestCase):
         )
         Payment.objects.create(
             loan_id=cls.loan_01,
-            status="MS",
+            status="missed",
             date=datetime(2019, 4, 24).astimezone(tz=timezone.utc),
             amount=Decimal("200"),
         )

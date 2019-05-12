@@ -18,6 +18,17 @@ class Client(models.Model):
     phone = models.BigIntegerField("Phone")
     cpf = models.BigIntegerField("CPF", unique=True)
 
+    @property
+    def is_indebted(self):
+        missed_payments = (
+            Payment.objects.filter(loan_id__client=self, status="missed")
+            .distinct()
+            .count()
+        )
+        if missed_payments >= 3:
+            return True
+        return False
+
     class Meta:
         verbose_name = "Client"
         verbose_name_plural = "Clients"
@@ -31,13 +42,20 @@ class Loan(models.Model):
     Loan Model
     Defines the attributes of a loan
     """
+
     client = models.ForeignKey(Client, on_delete=models.DO_NOTHING)
     amount = models.DecimalField(
-        "Amount", max_digits=15, decimal_places=2, validators=[MinValueValidator(Decimal("0.01"))]
+        "Amount",
+        max_digits=15,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal("0.01"))],
     )
     term = models.IntegerField("Term", validators=[MinValueValidator(1)])
     rate = models.DecimalField(
-        "Rate", max_digits=15, decimal_places=2, validators=[MinValueValidator(Decimal("0.01"))]
+        "Rate",
+        max_digits=15,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal("0.01"))],
     )
     date_initial = models.DateTimeField(
         "Date creation", auto_now=False, auto_now_add=False
@@ -76,8 +94,10 @@ class Loan(models.Model):
 
     def get_balance(self, date_base=datetime.now().astimezone(tz=timezone.utc)):
         try:
-            payments = self.payment_set.filter(status='made', date__lte=date_base).values('amount')
-            return self.amount - sum([payment['amount'] for payment in payments])
+            payments = self.payment_set.filter(
+                status="made", date__lte=date_base
+            ).values("amount")
+            return self.amount - sum([payment["amount"] for payment in payments])
         except:
             return Decimal("0")
 
@@ -94,15 +114,20 @@ class Payment(models.Model):
     Payment Model
     Defines the attributes of a Payment
     """
-    PAYMENT_CHOICES = (('made', 'made'), ('missed', 'missed'))
 
-    loan_id = models.ForeignKey('Loan', on_delete=models.CASCADE)
-    status = models.CharField('status', db_column='type', max_length=2, choices=PAYMENT_CHOICES)
-    date = models.DateTimeField('Date', auto_now=False, auto_now_add=False)
-    amount = models.DecimalField('Amount', max_digits=15, decimal_places=2,
-                                 validators=[
-                                    MinValueValidator(Decimal("0.01"))
-                                 ])
+    PAYMENT_CHOICES = (("made", "made"), ("missed", "missed"))
+
+    loan_id = models.ForeignKey("Loan", on_delete=models.CASCADE)
+    status = models.CharField(
+        "status", db_column="type", max_length=2, choices=PAYMENT_CHOICES
+    )
+    date = models.DateTimeField("Date", auto_now=False, auto_now_add=False)
+    amount = models.DecimalField(
+        "Amount",
+        max_digits=15,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal("0.01"))],
+    )
 
     class Meta:
         verbose_name = "Payment"
