@@ -2,7 +2,18 @@ from rest_framework import serializers
 from decimal import Decimal
 from datetime import datetime, timezone
 
-from .models import Loan, Payment
+from .models import Loan, Payment, Client
+
+
+class ClientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Client
+        fields = ('__all__')
+
+    def to_representation(self, obj):
+        return {
+            'client_id': str(obj.id)
+        }
 
 
 class LoanSerializer(serializers.ModelSerializer):

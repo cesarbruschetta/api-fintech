@@ -5,11 +5,18 @@ from decimal import Decimal
 from datetime import datetime
 
 from .models import Loan, Client
-from .serializers import LoanSerializer, PaymentSerializer, BalanceSerializer
-
+from .serializers import LoanSerializer, PaymentSerializer, BalanceSerializer, ClientSerializer
 
 @api_view(['POST'])
-def post_loans(request):
+def clients(request):
+    serializer = ClientSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def loans(request):
     try:
         Client.objects.get(pk=request.data.get('client_id'))
     except Client.DoesNotExist:
@@ -30,12 +37,12 @@ def post_loans(request):
 
 
 @api_view(['POST'])
-def post_payments(request, pk):
+def payments(request, pk):
     try:
         Loan.objects.get(pk=pk)
     except Loan.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
- 
+
     data = {
         'loan_id': pk,
         'status': request.data.get('payment'),
@@ -50,7 +57,7 @@ def post_payments(request, pk):
 
 
 @api_view(['GET'])
-def get_balance(request, pk):
+def balance(request, pk):
     try:
         Loan.objects.get(pk=pk)
     except Loan.DoesNotExist:

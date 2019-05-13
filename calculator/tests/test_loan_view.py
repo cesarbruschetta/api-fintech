@@ -30,7 +30,7 @@ class CreateNewLoanTest(TestCase):
             "client_id": self.client_1.pk
         }
         response = self.client.post(
-            reverse('post_loans'),
+            reverse('loans'),
             data=json.dumps(valid_payload),
             content_type='application/json'
         )
@@ -45,7 +45,7 @@ class CreateNewLoanTest(TestCase):
             "date": "2019-05-09 03:18Z"
         }
         response = self.client.post(
-            reverse('post_loans'),
+            reverse('loans'),
             data=json.dumps(invalid_payload),
             content_type='application/json'
         )
@@ -58,7 +58,7 @@ class CreateNewLoanTest(TestCase):
             "date": "2019-05-09 03:18Z"
         }
         response = self.client.post(
-            reverse('post_loans'),
+            reverse('loans'),
             data=json.dumps(invalid_payload),
             content_type='application/json'
         )
@@ -71,7 +71,7 @@ class CreateNewLoanTest(TestCase):
             "rate": 0.05
         }
         response = self.client.post(
-            reverse('post_loans'),
+            reverse('loans'),
             data=json.dumps(invalid_payload),
             content_type='application/json'
         )
@@ -85,7 +85,7 @@ class CreateNewLoanTest(TestCase):
             "date": "2019-05-09 03:18Z"
         }
         response = self.client.post(
-            reverse('post_loans'),
+            reverse('loans'),
             data=json.dumps(invalid_payload),
             content_type='application/json'
         )
