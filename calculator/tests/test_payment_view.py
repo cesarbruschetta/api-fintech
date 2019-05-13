@@ -38,7 +38,7 @@ class RegisterPaymentTest(TestCase):
             "date": "2019-05-09 03:18Z"
         }
         response = self.client.post(
-            reverse('post_payments', kwargs={'pk': self.loan.pk}),
+            reverse('payments', kwargs={'pk': self.loan.pk}),
             data=json.dumps(valid_payload),
             content_type='application/json'
         )        
@@ -52,7 +52,7 @@ class RegisterPaymentTest(TestCase):
             "date": "2019-05-09 03:18Z"
         }
         response = self.client.post(
-            reverse('post_payments', kwargs={'pk': 5}),
+            reverse('payments', kwargs={'pk': 5}),
             data=json.dumps(valid_payload),
             content_type='application/json'
         )        
@@ -65,7 +65,7 @@ class RegisterPaymentTest(TestCase):
             "date": "2019-05-09 03:18Z"
         }
         response = self.client.post(
-            reverse('post_payments', kwargs={'pk': self.loan.pk}),
+            reverse('payments', kwargs={'pk': self.loan.pk}),
             data=json.dumps(valid_payload),
             content_type='application/json'
         )
@@ -77,7 +77,7 @@ class RegisterPaymentTest(TestCase):
             "date": "2019-05-09 03:18Z"
         }
         response = self.client.post(
-            reverse('post_payments', kwargs={'pk': self.loan.pk}),
+            reverse('payments', kwargs={'pk': self.loan.pk}),
             data=json.dumps(valid_payload),
             content_type='application/json'
         )
@@ -90,7 +90,7 @@ class RegisterPaymentTest(TestCase):
             "date": ""
         }
         response = self.client.post(
-            reverse('post_payments', kwargs={'pk': self.loan.pk}),
+            reverse('payments', kwargs={'pk': self.loan.pk}),
             data=json.dumps(valid_payload),
             content_type='application/json'
         )
@@ -103,7 +103,7 @@ class RegisterPaymentTest(TestCase):
             "date": "20190509 03:18Z"
         }
         response = self.client.post(
-            reverse('post_payments', kwargs={'pk': self.loan.pk}),
+            reverse('payments', kwargs={'pk': self.loan.pk}),
             data=json.dumps(valid_payload),
             content_type='application/json'
         )
