@@ -97,7 +97,7 @@ class Payment(models.Model):
     PAYMENT_CHOICES = (('made', 'made'), ('missed', 'missed'))
 
     loan_id = models.ForeignKey('Loan', on_delete=models.CASCADE)
-    status = models.CharField('status', db_column='type', max_length=2, choices=PAYMENT_CHOICES)
+    status = models.CharField('status', db_column='type', max_length=6, choices=PAYMENT_CHOICES)
     date = models.DateTimeField('Date', auto_now=False, auto_now_add=False)
     amount = models.DecimalField('Amount', max_digits=15, decimal_places=2,
                                  validators=[
