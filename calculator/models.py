@@ -6,7 +6,7 @@ from decimal import Decimal, ROUND_DOWN
 from datetime import datetime, timezone
 
 
-git def increment_loan_id():
+def increment_loan_id():
         id_loan = '{:015d}'.format(Loan.objects.count() + 1)
         return '{}-{}-{}-{}'.format(id_loan[:3], id_loan[3:7], id_loan[7:11], id_loan[11:15])
 
