@@ -52,7 +52,7 @@ class RegisterPaymentTest(TestCase):
             "date": "2019-05-09 03:18Z"
         }
         response = self.client.post(
-            reverse('payments', kwargs={'pk': 5}),
+            reverse('payments', kwargs={'pk': '000-0000-0000-0005'}),
             data=json.dumps(valid_payload),
             content_type='application/json'
         )        
