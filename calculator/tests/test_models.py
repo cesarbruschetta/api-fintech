@@ -44,13 +44,15 @@ class LoanTest(TestCase):
             amount=Decimal("1001.00"),
             term=12,
             rate=Decimal("0.05"),
-            date_initial=datetime(2019, 3, 24, 11, 30).astimezone(tz=timezone.utc),
+            date_initial=datetime(
+                2019, 3, 24, 11, 30).astimezone(tz=timezone.utc),
         )
 
     def setUp(self):
-        self.loan_01 = Loan.objects.get(amount=Decimal("1001.00"), client=self.client_1)
+        self.loan_01 = Loan.objects.get(
+            amount=Decimal("1001.00"), client=self.client_1)
 
-    def test_loan(self):
+    def test_calculate_instalment(self):
         self.assertEqual(self.loan_01.instalment, Decimal("85.69"))
 
     def test_payment_made(self):
@@ -109,7 +111,8 @@ class BalanceTest(TestCase):
             amount=Decimal("1000.00"),
             term=12,
             rate=Decimal("0.05"),
-            date_initial=datetime(2019, 3, 24, 11, 30).astimezone(tz=timezone.utc),
+            date_initial=datetime(
+                2019, 3, 24, 11, 30).astimezone(tz=timezone.utc),
         )
         Payment.objects.create(
             loan_id=cls.loan_01,
@@ -148,3 +151,68 @@ class BalanceTest(TestCase):
 
     def test_balance_loan_without_date_base(self):
         self.assertEqual(self.loan_01.get_balance(), Decimal("600"))
+
+
+class InstalmentAdjustmentTest(TestCase):
+    """ Test module for Balance model """
+
+    @classmethod
+    def setUpClass(cls):
+        super(InstalmentAdjustmentTest, cls).setUpClass()
+
+        client = Client.objects.create(
+            name="Ian Marcos",
+            surname="Carvalho",
+            email="ianmarcoscarvalho@gmail.com.br",
+            phone="9137946863",
+            cpf="49603486078",
+        )
+
+        cls.loan_01 = Loan.objects.create(
+            client=client,
+            amount=Decimal("1000.00"),
+            term=12,
+            rate=Decimal("0.05"),
+            date_initial=datetime(
+                2019, 3, 24, 11, 30).astimezone(tz=timezone.utc),
+        )
+
+    def test_instalment_discount(self):
+        Payment.objects.create(
+            loan_id=self.loan_01,
+            status="made",
+            date=datetime(2019, 4, 24).astimezone(tz=timezone.utc),
+            amount=Decimal("1000"),
+        )
+        self.loan_02 = Loan.objects.create(
+            client=Client.objects.get(pk=1),
+            amount=Decimal("1000.00"),
+            term=12,
+            rate=Decimal("0.05"),
+            date_initial=datetime(
+                2019, 3, 24, 11, 30).astimezone(tz=timezone.utc),
+        )
+        self.assertEqual(self.loan_02.instalment, Decimal('83.89'))
+
+    def test_instalment_increase(self):
+        Payment.objects.create(
+            loan_id=self.loan_01,
+            status="missed",
+            date=datetime(2019, 4, 24).astimezone(tz=timezone.utc),
+            amount=Decimal("200"),
+        )
+        Payment.objects.create(
+            loan_id=self.loan_01,
+            status="made",
+            date=datetime(2019, 4, 24).astimezone(tz=timezone.utc),
+            amount=Decimal("1000"),
+        )
+        self.loan_02 = Loan.objects.create(
+            client=Client.objects.get(pk=1),
+            amount=Decimal("1000.00"),
+            term=12,
+            rate=Decimal("0.05"),
+            date_initial=datetime(
+                2019, 3, 24, 11, 30).astimezone(tz=timezone.utc),
+        )
+        self.assertEqual(self.loan_02.instalment, Decimal('89.03'))

@@ -19,13 +19,18 @@ class Client(models.Model):
     cpf = models.BigIntegerField("CPF", unique=True)
 
     @property
-    def is_indebted(self):
+    def is_indebt(self):
+        loans_history = self.loan_set.all()
+        existing_debt = sum(
+            [loans_history[i].get_balance()
+             for i in range(len(loans_history) - 1)]
+        )
         missed_payments = (
             Payment.objects.filter(loan_id__client=self, status="missed")
             .distinct()
             .count()
         )
-        if missed_payments >= 3:
+        if missed_payments >= 3 or existing_debt > 0:
             return True
         return False
 
@@ -60,30 +65,32 @@ class Loan(models.Model):
     date_initial = models.DateTimeField(
         "Date creation", auto_now=False, auto_now_add=False
     )
+    instalment = models.DecimalField(
+        "Instalment",
+        default=Decimal('0.0'),
+        max_digits=15,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal("0.01"))],
+    )
 
     def _instalment_adjustment(self):
         loans_history = self.client.loan_set.all()
         missed_payments = sum(
             [
-                Payment.objects.filter(loan_id=loan, status="MS").count()
+                Payment.objects.filter(loan_id=loan, status="missed").count()
                 for loan in loans_history
             ]
         )
-        if len(loans_history) > 1:
-            existing_debt = sum(
-                [loans_history[i].get_balance() for i in range(len(loans_history) - 1)]
-            )
-            adjustment = 0
-            if existing_debt == 0:
-                if missed_payments == 0:
-                    adjustment = -0.02
-                elif 0 < missed_payments <= 3:
-                    adjustment = 0.04
-                return Decimal(adjustment)
+        if len(loans_history) >= 1:
+            adjustment = Decimal('1')
+            if missed_payments == 0:
+                adjustment = -0.02
+            elif 0 < missed_payments <= 3:
+                adjustment = 0.04
+            return Decimal(adjustment)
         return Decimal(0)
 
-    @property
-    def instalment(self):
+    def calculate_instalment(self):
         r = self.rate / self.term
         instalment = (
             (r + r / ((1 + r) ** self.term - 1))
@@ -100,6 +107,10 @@ class Loan(models.Model):
             return self.amount - sum([payment["amount"] for payment in payments])
         except:
             return Decimal("0")
+
+    def save(self, *args, **kwargs):
+        self.instalment += + self.calculate_instalment()
+        super(Loan, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Loan"
