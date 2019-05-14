@@ -3,11 +3,12 @@ import unittest
 from rest_framework import status
 from django.test import TestCase
 from django.urls import reverse
-from ..models import Loan, Client, Payment
-from ..serializers import LoanSerializer
 
 from decimal import Decimal
 from datetime import datetime, timezone
+
+from ..models import Loan, Client, Payment
+from ..serializers import LoanSerializer
 
 
 class CreateNewLoanTest(TestCase):
@@ -30,67 +31,101 @@ class CreateNewLoanTest(TestCase):
             "term": 12,
             "rate": 0.05,
             "date": "2019-05-09 03:18Z",
-            "client_id": self.client_1.pk
+            "client_id": self.client_1.pk,
         }
         response = self.client.post(
             reverse('loans'),
             data=json.dumps(valid_payload),
-            content_type='application/json'
+            content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data, {'id': '1', 'installment': 85.60})
+        self.assertEqual(response.data, {"id": "1", "installment": 85.60})
 
     def test_create_invalid_term_loan(self):
         invalid_payload = {
             "amount": 1000,
             "term": 0,
             "rate": 0.05,
-            "date": "2019-05-09 03:18Z"
+            "date": "2019-05-09 03:18Z",
         }
         response = self.client.post(
             reverse('loans'),
             data=json.dumps(invalid_payload),
-            content_type='application/json'
+            content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-    
+
     def test_create_invalid_amount_loan(self):
-        invalid_payload = {
-            "term": 1,
-            "rate": 0.05,
-            "date": "2019-05-09 03:18Z"
-        }
+        invalid_payload = {"term": 1, "rate": 0.05, "date": "2019-05-09 03:18Z"}
         response = self.client.post(
             reverse('loans'),
             data=json.dumps(invalid_payload),
-            content_type='application/json'
+            content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_invalid_date_loan(self):
-        invalid_payload = {
-            "amount": 1000,
-            "term": 1,
-            "rate": 0.05
-        }
+        invalid_payload = {"amount": 1000, "term": 1, "rate": 0.05}
         response = self.client.post(
-            reverse('loans'),
+            reverse("loans"),
             data=json.dumps(invalid_payload),
-            content_type='application/json'
+            content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-    
+
     def test_create_invalid_rate_loan(self):
         invalid_payload = {
             "amount": 1000,
             "term": 1,
             "rate": 0,
-            "date": "2019-05-09 03:18Z"
+            "date": "2019-05-09 03:18Z",
         }
         response = self.client.post(
             reverse('loans'),
             data=json.dumps(invalid_payload),
-            content_type='application/json'
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_client_have_debit(self):
+
+        loan_01 = Loan.objects.create(
+            client=self.client_1,
+            amount=Decimal("1000.00"),
+            term=12,
+            rate=Decimal("0.05"),
+            date_initial=datetime(2019, 3, 24, 11, 30).astimezone(tz=timezone.utc),
+        )
+        Payment.objects.create(
+            loan_id=loan_01,
+            status="missed",
+            date=datetime(2019, 4, 24).astimezone(tz=timezone.utc),
+            amount=Decimal("200"),
+        )
+        Payment.objects.create(
+            loan_id=loan_01,
+            status="missed",
+            date=datetime(2019, 4, 24).astimezone(tz=timezone.utc),
+            amount=Decimal("200"),
+        )
+        Payment.objects.create(
+            loan_id=loan_01,
+            status="missed",
+            date=datetime(2019, 4, 24).astimezone(tz=timezone.utc),
+            amount=Decimal("200"),
+        )
+
+        invalid_payload = {
+            "amount": 1000,
+            "term": 12,
+            "rate": 0.05,
+            "date": "2019-05-09 03:18Z",
+            "client_id": self.client_1.id,
+        }
+        response = self.client.post(
+            reverse('loans'),
+            data=json.dumps(invalid_payload),
+            content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
     
