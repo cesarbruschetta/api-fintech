@@ -5,7 +5,12 @@ from decimal import Decimal
 from datetime import datetime
 
 from .models import Loan, Client
-from .serializers import LoanSerializer, PaymentSerializer, BalanceSerializer, ClientSerializer
+from .serializers import (
+    LoanSerializer,
+    PaymentSerializer,
+    BalanceSerializer,
+    ClientSerializer,
+)
 
 @api_view(['POST'])
 def clients(request):
@@ -18,16 +23,16 @@ def clients(request):
 @api_view(['POST'])
 def loans(request):
     try:
-        Client.objects.get(pk=request.data.get('client_id'))
+        Client.objects.get(pk=request.data.get("client_id"))
     except Client.DoesNotExist:
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
     data = {
-        'amount': request.data.get('amount'),
-        'term': request.data.get('term'),
-        'rate': request.data.get('rate'),
-        'date_initial': request.data.get('date'),
-        'client': request.data.get('client_id')
+        "amount": request.data.get("amount"),
+        "term": request.data.get("term"),
+        "rate": request.data.get("rate"),
+        "date_initial": request.data.get("date"),
+        "client": request.data.get("client_id"),
     }
     serializer = LoanSerializer(data=data)
     if serializer.is_valid():
@@ -44,10 +49,10 @@ def payments(request, pk):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     data = {
-        'loan_id': pk,
-        'status': request.data.get('payment'),
-        'date': request.data.get('date'),
-        'amount': request.data.get('amount')
+        "loan_id": pk,
+        "status": request.data.get("payment"),
+        "date": request.data.get("date"),
+        "amount": request.data.get("amount"),
     }
     serializer = PaymentSerializer(data=data)
     if serializer.is_valid():
@@ -62,10 +67,10 @@ def balance(request, pk):
         Loan.objects.get(pk=pk)
     except Loan.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
-    
-    serializer = BalanceSerializer(data={'date': request.query_params.get('date'), 'loan_id': pk})
+
+    serializer = BalanceSerializer(
+        data={"date": request.query_params.get("date"), "loan_id": pk}
+    )
     if serializer.is_valid():
         return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    

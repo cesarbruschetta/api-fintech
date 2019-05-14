@@ -23,6 +23,17 @@ class Client(models.Model):
     phone = models.BigIntegerField("Phone")
     cpf = models.BigIntegerField("CPF", unique=True)
 
+    @property
+    def is_indebted(self):
+        missed_payments = (
+            Payment.objects.filter(loan_id__client=self, status="missed")
+            .distinct()
+            .count()
+        )
+        if missed_payments >= 3:
+            return True
+        return False
+
     class Meta:
         verbose_name = "Client"
         verbose_name_plural = "Clients"
@@ -39,39 +50,47 @@ class Loan(models.Model):
     id = models.CharField(max_length=19, default=increment_loan_id, editable=False, primary_key=True)
     client = models.ForeignKey(Client, on_delete=models.DO_NOTHING)
     amount = models.DecimalField(
-        "Amount", max_digits=15, decimal_places=2, validators=[MinValueValidator(Decimal("0.01"))]
+        "Amount",
+        max_digits=15,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal("0.01"))],
     )
     term = models.IntegerField("Term", validators=[MinValueValidator(1)])
     rate = models.DecimalField(
-        "Rate", max_digits=15, decimal_places=2, validators=[MinValueValidator(Decimal("0.01"))]
+        "Rate",
+        max_digits=15,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal("0.01"))],
     )
     date_initial = models.DateTimeField(
         "Date creation", auto_now=False, auto_now_add=False
+    )
+    instalment = models.DecimalField(
+        "Instalment",
+        default=Decimal('0.0'),
+        max_digits=15,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal("0.01"))],
     )
 
     def _instalment_adjustment(self):
         loans_history = self.client.loan_set.all()
         missed_payments = sum(
             [
-                Payment.objects.filter(loan_id=loan, status="MS").count()
+                Payment.objects.filter(loan_id=loan, status="missed").count()
                 for loan in loans_history
             ]
         )
-        if len(loans_history) > 1:
-            existing_debt = sum(
-                [loans_history[i].get_balance() for i in range(len(loans_history) - 1)]
-            )
-            adjustment = 0
-            if existing_debt == 0:
-                if missed_payments == 0:
-                    adjustment = -0.02
-                elif 0 < missed_payments <= 3:
-                    adjustment = 0.04
-                return Decimal(adjustment)
+        if len(loans_history) >= 1:
+            adjustment = Decimal('1')
+            if missed_payments == 0:
+                adjustment = -0.02
+            elif 0 < missed_payments <= 3:
+                adjustment = 0.04
+            return Decimal(adjustment)
         return Decimal(0)
 
-    @property
-    def instalment(self):
+    def calculate_instalment(self):
         r = self.rate / self.term
         instalment = (
             (r + r / ((1 + r) ** self.term - 1))
@@ -82,10 +101,16 @@ class Loan(models.Model):
 
     def get_balance(self, date_base=datetime.now().astimezone(tz=timezone.utc)):
         try:
-            payments = self.payment_set.filter(status='made', date__lte=date_base).values('amount')
-            return self.amount - sum([payment['amount'] for payment in payments])
+            payments = self.payment_set.filter(
+                status="made", date__lte=date_base
+            ).values("amount")
+            return self.amount - sum([payment["amount"] for payment in payments])
         except:
             return Decimal("0")
+
+    def save(self, *args, **kwargs):
+        self.instalment += self.calculate_instalment()
+        super(Loan, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Loan"
@@ -103,7 +128,7 @@ class Payment(models.Model):
     PAYMENT_CHOICES = (('made', 'made'), ('missed', 'missed'))
 
     loan_id = models.ForeignKey('Loan', on_delete=models.CASCADE)
-    status = models.CharField('status', db_column='type', max_length=2, choices=PAYMENT_CHOICES)
+    status = models.CharField('status', db_column='type', max_length=6, choices=PAYMENT_CHOICES)
     date = models.DateTimeField('Date', auto_now=False, auto_now_add=False)
     amount = models.DecimalField('Amount', max_digits=15, decimal_places=2,
                                  validators=[
