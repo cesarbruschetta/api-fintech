@@ -68,6 +68,6 @@ class BalanceViewTest(TestCase):
 
     def test_get_balance_invalid_loan(self):
         response = self.client.get(
-            reverse('balance', kwargs={'pk': 850})
+            reverse('balance', kwargs={'pk': '000-0000-0000-0015'})
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

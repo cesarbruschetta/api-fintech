@@ -43,7 +43,7 @@ class RegisterPaymentTest(TestCase):
     def test_register_payment_without_loan(self):
         valid_payload = {"payment": "made", "amount": 100, "date": "2019-05-09 03:18Z"}
         response = self.client.post(
-            reverse('payments', kwargs={'pk': 5}),
+            reverse('payments', kwargs={'pk': '000-0000-0000-0005'}),
             data=json.dumps(valid_payload),
             content_type="application/json",
         )

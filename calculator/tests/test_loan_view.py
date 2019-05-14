@@ -39,7 +39,7 @@ class CreateNewLoanTest(TestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data, {"id": "1", "installment": 85.60})
+        self.assertEqual(response.data, {'id': '000-0000-0000-0001', 'installment': 85.60})
 
     def test_create_invalid_term_loan(self):
         invalid_payload = {
