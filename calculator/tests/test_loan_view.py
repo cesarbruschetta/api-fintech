@@ -3,8 +3,11 @@ import unittest
 from rest_framework import status
 from django.test import TestCase
 from django.urls import reverse
-from ..models import Loan, Client
+from ..models import Loan, Client, Payment
 from ..serializers import LoanSerializer
+
+from decimal import Decimal
+from datetime import datetime, timezone
 
 
 class CreateNewLoanTest(TestCase):
@@ -88,5 +91,46 @@ class CreateNewLoanTest(TestCase):
             reverse('loans'),
             data=json.dumps(invalid_payload),
             content_type='application/json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    def test_create_client_have_debit(self):
+
+        loan_01 = Loan.objects.create(
+            client=self.client_1,
+            amount=Decimal("1000.00"),
+            term=12,
+            rate=Decimal("0.05"),
+            date_initial=datetime(2019, 3, 24, 11, 30).astimezone(tz=timezone.utc),
+        )
+        Payment.objects.create(
+            loan_id=loan_01,
+            status="missed",
+            date=datetime(2019, 4, 24).astimezone(tz=timezone.utc),
+            amount=Decimal("200"),
+        )
+        Payment.objects.create(
+            loan_id=loan_01,
+            status="missed",
+            date=datetime(2019, 4, 24).astimezone(tz=timezone.utc),
+            amount=Decimal("200"),
+        )
+        Payment.objects.create(
+            loan_id=loan_01,
+            status="missed",
+            date=datetime(2019, 4, 24).astimezone(tz=timezone.utc),
+            amount=Decimal("200"),
+        )
+        invalid_payload = {
+            "amount": 1000,
+            "term": 12,
+            "rate": 0.05,
+            "date": "2019-05-09 03:18Z",
+            "client_id": self.client_1.id,
+        }
+        response = self.client.post(
+            reverse('loans'),
+            data=json.dumps(invalid_payload),
+            content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

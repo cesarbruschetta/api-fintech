@@ -18,6 +18,17 @@ class Client(models.Model):
     phone = models.BigIntegerField("Phone")
     cpf = models.BigIntegerField("CPF", unique=True)
 
+    @property
+    def is_indebted(self):
+        missed_payments = (
+            Payment.objects.filter(loan_id__client=self, status="missed")
+            .distinct()
+            .count()
+        )
+        if missed_payments >= 3:
+            return True
+        return False
+
     class Meta:
         verbose_name = "Client"
         verbose_name_plural = "Clients"
