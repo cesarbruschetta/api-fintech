@@ -7,7 +7,8 @@ class ClientAdmin(admin.ModelAdmin):
 
 
 class LoanAdmin(admin.ModelAdmin):
-    list_display = ("id", "client", "amount", "term", "rate", "date_initial")
+    list_display = ("id", "client", "amount", "term", "rate", "date_initial", "instalment")
+    readonly_fields = ("instalment",)
 
 
 class PaymentAdmin(admin.ModelAdmin):
