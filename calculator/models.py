@@ -104,7 +104,7 @@ class Loan(models.Model):
             return Decimal("0")
 
     def save(self, *args, **kwargs):
-        self.instalment += + self.calculate_instalment()
+        self.instalment += self.calculate_instalment()
         super(Loan, self).save(*args, **kwargs)
 
     class Meta:
