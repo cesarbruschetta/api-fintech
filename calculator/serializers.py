@@ -27,6 +27,11 @@ class LoanSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Denied loan request")
         return client
 
+    def validate_client(self, client):
+        if client.is_indebted:
+            raise serializers.ValidationError("Denied loan request")
+        return client
+
 
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:

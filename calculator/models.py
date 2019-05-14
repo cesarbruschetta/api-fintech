@@ -19,18 +19,13 @@ class Client(models.Model):
     cpf = models.BigIntegerField("CPF", unique=True)
 
     @property
-    def is_indebt(self):
-        loans_history = self.loan_set.all()
-        existing_debt = sum(
-            [loans_history[i].get_balance()
-             for i in range(len(loans_history) - 1)]
-        )
+    def is_indebted(self):
         missed_payments = (
             Payment.objects.filter(loan_id__client=self, status="missed")
             .distinct()
             .count()
         )
-        if missed_payments >= 3 or existing_debt > 0:
+        if missed_payments >= 3:
             return True
         return False
 
@@ -125,20 +120,15 @@ class Payment(models.Model):
     Payment Model
     Defines the attributes of a Payment
     """
+    PAYMENT_CHOICES = (('made', 'made'), ('missed', 'missed'))
 
-    PAYMENT_CHOICES = (("made", "made"), ("missed", "missed"))
-
-    loan_id = models.ForeignKey("Loan", on_delete=models.CASCADE)
-    status = models.CharField(
-        "status", db_column="type", max_length=2, choices=PAYMENT_CHOICES
-    )
-    date = models.DateTimeField("Date", auto_now=False, auto_now_add=False)
-    amount = models.DecimalField(
-        "Amount",
-        max_digits=15,
-        decimal_places=2,
-        validators=[MinValueValidator(Decimal("0.01"))],
-    )
+    loan_id = models.ForeignKey('Loan', on_delete=models.CASCADE)
+    status = models.CharField('status', db_column='type', max_length=6, choices=PAYMENT_CHOICES)
+    date = models.DateTimeField('Date', auto_now=False, auto_now_add=False)
+    amount = models.DecimalField('Amount', max_digits=15, decimal_places=2,
+                                 validators=[
+                                    MinValueValidator(Decimal("0.01"))
+                                 ])
 
     class Meta:
         verbose_name = "Payment"

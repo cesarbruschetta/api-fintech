@@ -18,7 +18,7 @@ class CreateNewClientTest(TestCase):
             "cpf": "51281103898",
         }
         response = self.client.post(
-            reverse("post_clients"),
+            reverse('clients'),
             data=json.dumps(valid_payload),
             content_type="application/json",
         )
@@ -33,7 +33,7 @@ class CreateNewClientTest(TestCase):
             "phone": "9137946863",
         }
         response = self.client.post(
-            reverse("post_clients"),
+            reverse('clients'),
             data=json.dumps(invalid_payload),
             content_type="application/json",
         )

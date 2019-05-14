@@ -34,7 +34,7 @@ class CreateNewLoanTest(TestCase):
             "client_id": self.client_1.pk,
         }
         response = self.client.post(
-            reverse("post_loans"),
+            reverse('loans'),
             data=json.dumps(valid_payload),
             content_type="application/json",
         )
@@ -49,7 +49,7 @@ class CreateNewLoanTest(TestCase):
             "date": "2019-05-09 03:18Z",
         }
         response = self.client.post(
-            reverse("post_loans"),
+            reverse('loans'),
             data=json.dumps(invalid_payload),
             content_type="application/json",
         )
@@ -58,7 +58,7 @@ class CreateNewLoanTest(TestCase):
     def test_create_invalid_amount_loan(self):
         invalid_payload = {"term": 1, "rate": 0.05, "date": "2019-05-09 03:18Z"}
         response = self.client.post(
-            reverse("post_loans"),
+            reverse('loans'),
             data=json.dumps(invalid_payload),
             content_type="application/json",
         )
@@ -67,7 +67,7 @@ class CreateNewLoanTest(TestCase):
     def test_create_invalid_date_loan(self):
         invalid_payload = {"amount": 1000, "term": 1, "rate": 0.05}
         response = self.client.post(
-            reverse("post_loans"),
+            reverse("loans"),
             data=json.dumps(invalid_payload),
             content_type="application/json",
         )
@@ -81,7 +81,7 @@ class CreateNewLoanTest(TestCase):
             "date": "2019-05-09 03:18Z",
         }
         response = self.client.post(
-            reverse("post_loans"),
+            reverse('loans'),
             data=json.dumps(invalid_payload),
             content_type="application/json",
         )
@@ -123,7 +123,48 @@ class CreateNewLoanTest(TestCase):
             "client_id": self.client_1.id,
         }
         response = self.client.post(
-            reverse("post_loans"),
+            reverse('loans'),
+            data=json.dumps(invalid_payload),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    def test_create_client_have_debit(self):
+
+        loan_01 = Loan.objects.create(
+            client=self.client_1,
+            amount=Decimal("1000.00"),
+            term=12,
+            rate=Decimal("0.05"),
+            date_initial=datetime(2019, 3, 24, 11, 30).astimezone(tz=timezone.utc),
+        )
+        Payment.objects.create(
+            loan_id=loan_01,
+            status="missed",
+            date=datetime(2019, 4, 24).astimezone(tz=timezone.utc),
+            amount=Decimal("200"),
+        )
+        Payment.objects.create(
+            loan_id=loan_01,
+            status="missed",
+            date=datetime(2019, 4, 24).astimezone(tz=timezone.utc),
+            amount=Decimal("200"),
+        )
+        Payment.objects.create(
+            loan_id=loan_01,
+            status="missed",
+            date=datetime(2019, 4, 24).astimezone(tz=timezone.utc),
+            amount=Decimal("200"),
+        )
+        invalid_payload = {
+            "amount": 1000,
+            "term": 12,
+            "rate": 0.05,
+            "date": "2019-05-09 03:18Z",
+            "client_id": self.client_1.id,
+        }
+        response = self.client.post(
+            reverse('loans'),
             data=json.dumps(invalid_payload),
             content_type="application/json",
         )

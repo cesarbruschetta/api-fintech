@@ -12,18 +12,16 @@ from .serializers import (
     ClientSerializer,
 )
 
-
-@api_view(["POST"])
-def post_clients(request):
+@api_view(['POST'])
+def clients(request):
     serializer = ClientSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-@api_view(["POST"])
-def post_loans(request):
+@api_view(['POST'])
+def loans(request):
     try:
         Client.objects.get(pk=request.data.get("client_id"))
     except Client.DoesNotExist:
@@ -43,8 +41,8 @@ def post_loans(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(["POST"])
-def post_payments(request, pk):
+@api_view(['POST'])
+def payments(request, pk):
     try:
         Loan.objects.get(pk=pk)
     except Loan.DoesNotExist:
@@ -63,8 +61,8 @@ def post_payments(request, pk):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(["GET"])
-def get_balance(request, pk):
+@api_view(['GET'])
+def balance(request, pk):
     try:
         Loan.objects.get(pk=pk)
     except Loan.DoesNotExist:
