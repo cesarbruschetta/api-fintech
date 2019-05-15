@@ -4,11 +4,14 @@ from rest_framework import status
 from django.test import TestCase
 from django.urls import reverse
 from ..models import Client
+from .token import get_token
 
 
 class CreateNewClientTest(TestCase):
     """ Test module for inserting a new Client """
-
+    def setUp(self):
+        self.client.defaults['HTTP_AUTHORIZATION'] = get_token()
+        
     def test_create_valid_client(self):
         valid_payload = {
             "name": "Ian Marcos",
