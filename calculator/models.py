@@ -73,7 +73,7 @@ class Loan(models.Model):
         validators=[MinValueValidator(Decimal("0.01"))],
     )
 
-    def _instalment_adjustment(self):
+    def _rate_adjustment(self):
         loans_history = self.client.loan_set.all()
         missed_payments = sum(
             [
@@ -81,21 +81,20 @@ class Loan(models.Model):
                 for loan in loans_history
             ]
         )
+        adjustment = Decimal('0')
         if len(loans_history) >= 1:
-            adjustment = Decimal('1')
             if missed_payments == 0:
-                adjustment = -0.02
+                adjustment = Decimal("-0.02")
             elif 0 < missed_payments <= 3:
-                adjustment = 0.04
-            return Decimal(adjustment)
-        return Decimal(0)
+                adjustment = Decimal("0.04")
+        return Decimal(adjustment)
 
     def calculate_instalment(self):
-        r = self.rate / self.term
+        r = (self.rate + self._rate_adjustment())/ self.term
         instalment = (
             (r + r / ((1 + r) ** self.term - 1))
             * self.amount
-            * (1 + self._instalment_adjustment())
+            #* self._rate_adjustment()
         )
         return instalment.quantize(Decimal(".01"), rounding=ROUND_DOWN)
 
