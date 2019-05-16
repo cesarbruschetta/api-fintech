@@ -23,6 +23,30 @@ securitySchemes:
           description: Authentication problem (JWT not set or expired)
 
 types:
+  Client:
+    properties: 
+      name:
+        description: Client's first name.
+        type: string
+      surname:
+        description: Client's last name.
+        type: string
+      email:
+        description: Client's email.
+        type: string
+      phone:
+        description: Client's phone.
+        type: integer
+      cpf:
+        description: Client's Identification Number. An eleven-digit number used as a tracking number by the Department of Federal Revenue of Brazil.
+        type: integer
+    example: {
+              "name": "Felicity",
+              "surname": "Jones",
+              "phone": 11984345678,
+              "email": "felicity@gmail.com",
+              "cpf": 34598712387
+              }    
   Loan:
     properties:
       amount:
@@ -68,8 +92,7 @@ types:
         format: float
     example: {
               "balance": 40
-             }
-        
+             }        
   Payment:
     properties:
       payment:
@@ -87,8 +110,7 @@ types:
               "payment": "made",
               "date": "2019-05-09T03:18:00Z",
               "amount": 85.60
-             }
-        
+             }      
 traits:
   dataValidation:
     responses:
@@ -105,8 +127,17 @@ traits:
         body: 
           properties:
             error: string
-            code: string
-
+            code: string         
+/client:
+  post:
+    is: [dataValidation]
+    description: Create a client in the system.
+    securedBy: JWT
+    body: 
+      type: Client
+    responses: 
+      201:
+        description: Return a new client
 /loans:
   post:
     is: [dataValidation]
@@ -116,7 +147,7 @@ traits:
         type: Loan
     responses:
         201:
-            description: Return the new loan
+            description: Return a new loan
             body: Loan_info
 
   '/{id}':
@@ -125,7 +156,7 @@ traits:
         description: The Loan identifier
         type: string
 
-    /payment:
+    /payments:
       post:
         is: [dataValidation, uriValidation]
         description:  Create a record of a payment made or missed.
@@ -135,7 +166,6 @@ traits:
         responses:
           201:
             description:  Success, receive the remaining amount about payment id
-
     /balance:
       get:
         is: [dataValidation, uriValidation]
@@ -152,4 +182,3 @@ traits:
           200:
             description:  Balance, outstanding debt of loan
             body: LoanBalance
-                          
