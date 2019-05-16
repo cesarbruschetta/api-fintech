@@ -1,5 +1,6 @@
 Django==2.2.1
 djangorestframework==3.9.3
+python-dateutil==2.8.0
 pytz==2019.1
+six==1.12.0
 sqlparse==0.3.0
-djangorestframework==3.9.3
