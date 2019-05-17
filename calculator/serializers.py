@@ -55,3 +55,10 @@ class BalanceSerializer(serializers.Serializer):
         if not obj["date"]:
             obj["date"] = datetime.now().astimezone(tz=timezone.utc)
         return {"balance": Loan.objects.get(pk=obj["loan_id"]).get_balance(obj["date"])}
+    
+    def validate(self, data):
+        if data["date"]:
+            loan = Loan.objects.get(pk=data["loan_id"])
+            if data["date"] < loan.date_initial:
+                raise serializers.ValidationError("The date should be greater than the initial date loan")
+        return data
