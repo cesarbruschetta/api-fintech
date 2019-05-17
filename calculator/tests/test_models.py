@@ -327,7 +327,7 @@ class InstalmentTest(TestCase):
         total_cost = Decimal(loan.term * loan.instalment)
         self.assertAlmostEqual(total_cost, calculated_cost, delta=0.08)
 
-    def test_float_places_loan3(self):
+    def test_float_places_loan4(self):
         _2places = Decimal("0.00")
         loan = self.loan_04
         with localcontext() as ctx:
