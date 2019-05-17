@@ -27,13 +27,13 @@ class Client(models.Model):
     @property
     def is_indebted(self):
         
-        loads = self.loan_set.all()
+        loans = self.loan_set.all()
         mp = 0
-        for load in loads:
-            last_date = load.date_initial + relativedelta(months=+load.term)
-            balance = load.get_balance(date_base=last_date)
+        for loan in loans:
+            last_date = loan.date_initial + relativedelta(months=+loan.term)
+            balance = loan.get_balance(date_base=last_date)
             if balance > 0:
-                mp = load.missed_payments
+                mp = loan.missed_payments
                 
         if mp >= 3:
             return True
