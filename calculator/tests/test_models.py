@@ -1,7 +1,7 @@
 import unittest
 from django.test import TestCase
 from datetime import datetime, timezone
-from decimal import Decimal, ROUND_DOWN, localcontext
+from decimal import *
 
 from ..models import Loan, Payment, Client
 
