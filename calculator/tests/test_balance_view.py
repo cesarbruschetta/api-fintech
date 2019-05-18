@@ -53,14 +53,14 @@ class BalanceViewTest(TestCase):
             valid_payload
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {"balance": Decimal("600")})
+        self.assertEqual(response.data, {"balance": Decimal("627.20")})
 
     def test_get_balance_without_payload(self):
         response = self.client.get(
             reverse('balance', kwargs={'pk': self.loan.pk})
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {"balance": Decimal("800")})
+        self.assertEqual(response.data, {"balance": Decimal("827.20")})
 
     def test_get_balance_without_date(self):
         valid_payload = {"date": ""}

@@ -21,7 +21,7 @@ class ValidateloanPaymentTest(TestCase):
             surname="Carvalho",
             email="ianmarcoscarvalho@gmail.com.br",
             phone="9137946863",
-            cpf="20442121030",
+            cpf="11142121030",
         )
         cls.loan = Loan.objects.create(
             client=client,
@@ -143,7 +143,7 @@ class ValidateClientLoanTest(TestCase):
             rate=Decimal("0.05"),
             date_initial=datetime(2019, 1, 1, 12, 00).astimezone(tz=timezone.utc),
         )
-        
+
         Payment.objects.create(
             loan_id=loan,
             status="missed",
@@ -166,7 +166,7 @@ class ValidateClientLoanTest(TestCase):
             loan_id=loan,
             status="made",
             date=datetime(2019, 5, 1).astimezone(tz=timezone.utc),
-            amount=Decimal("1000"),
+            amount=Decimal("1027.20"),
         )
 
         valid_payloan = {
