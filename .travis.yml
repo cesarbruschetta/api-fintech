@@ -10,6 +10,6 @@ before_install:
     - pip install coveralls
 script:
   - python manage.py test -v2
-  - coverage run manage.py test -v2
+  # - coverage run manage.py test -v2
 after_success:
   - coveralls
