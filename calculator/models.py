@@ -177,9 +177,7 @@ class Payment(models.Model):
         """Returns a instalment value based on made/missed payments"""
         loan = self.loan_id
         remainder_instalments = loan.term - loan.payment_set.count()
-        next_instalment = (loan.get_balance() /
-                           remainder_instalments).quantize(self.CENTS)
-        return next_instalment
+        return (loan.get_balance() / remainder_instalments).quantize(self.CENTS)
 
     def __str__(self):
         return f"Payment(loan_id={self.loan_id}, status={self.status}, date={self.date}, amount={self.amount})"
