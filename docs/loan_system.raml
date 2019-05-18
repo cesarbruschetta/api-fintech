@@ -111,6 +111,19 @@ types:
               "date": "2019-05-09T03:18:00Z",
               "amount": 85.60
              }      
+  Payment_info:
+    status: 
+      description: Type of payment
+      type: string
+    amount:
+      description: Amount of the payment made or missed in dollars
+      type: number
+      format: float
+    expected:
+      description: Amount expected to be paid for the instalment
+      type: number
+      format: float
+
 traits:
   dataValidation:
     responses:

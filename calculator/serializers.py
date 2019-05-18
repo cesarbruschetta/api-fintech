@@ -20,7 +20,7 @@ class LoanSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def to_representation(self, obj):
-        return {"id": str(obj.id), "instalment": round(Decimal(obj.instalment), 2)}
+        return {"id": str(obj.id), "instalment": obj.instalment}
 
     def validate_client(self, client):
         if client.is_indebted:
