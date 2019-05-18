@@ -28,7 +28,8 @@ class RegisterPaymentTest(TestCase):
             amount=Decimal("1001.00"),
             term=12,
             rate=Decimal("0.05"),
-            date_initial=datetime(2019, 3, 24, 11, 30).astimezone(tz=timezone.utc),
+            date_initial=datetime(
+                2019, 3, 24, 11, 30).astimezone(tz=timezone.utc),
         )
 
     def setUp(self):
@@ -46,7 +47,8 @@ class RegisterPaymentTest(TestCase):
         self.assertEqual(response.data, {})
 
     def test_register_payment_without_loan(self):
-        valid_payload = {"payment": "made", "amount": 100, "date": "2019-05-09 03:18Z"}
+        valid_payload = {"payment": "made",
+                         "amount": 100, "date": "2019-05-09 03:18Z"}
         response = self.client.post(
             reverse('payments', kwargs={'pk': '000-0000-0000-0005'}),
             data=json.dumps(valid_payload),
@@ -55,7 +57,8 @@ class RegisterPaymentTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_register_payment_without_type(self):
-        valid_payload = {"payment": "", "amount": 100, "date": "2019-05-09 03:18Z"}
+        valid_payload = {"payment": "", "amount": 100,
+                         "date": "2019-05-09 03:18Z"}
         response = self.client.post(
             reverse('payments', kwargs={'pk': self.loan.pk}),
             data=json.dumps(valid_payload),
@@ -79,7 +82,8 @@ class RegisterPaymentTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_register_payment_invalid_format_date(self):
-        valid_payload = {"payment": "made", "amount": 100, "date": "20190509 03:18Z"}
+        valid_payload = {"payment": "made",
+                         "amount": 100, "date": "20190509 03:18Z"}
         response = self.client.post(
             reverse('payments', kwargs={'pk': self.loan.pk}),
             data=json.dumps(valid_payload),
