@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 
 from ..models import Loan, Client, Payment
 from ..serializers import LoanSerializer
+from .token import get_token
 
 
 class CreateNewLoanTest(TestCase):
@@ -24,6 +25,9 @@ class CreateNewLoanTest(TestCase):
             phone="9137946863",
             cpf="51281103891",
         )
+
+    def setUp(self):
+        self.client.defaults['HTTP_AUTHORIZATION'] = get_token()
 
     def test_create_valid_loan(self):
         valid_payload = {

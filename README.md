@@ -1,5 +1,11 @@
 # Loan Management System
 
+## Coverage Status
+[![Coverage Status](https://coveralls.io/repos/github/cesarbruschetta/api-fintech/badge.svg)](https://coveralls.io/github/cesarbruschetta/api-fintech)
+
+## Build Status
+[![Build Status](https://travis-ci.org/cesarbruschetta/api-fintech.svg?branch=master)](https://travis-ci.org/cesarbruschetta/api-fintech.svg?branch=master)
+
 ## Objective
 The main objective of this project is to create an API to manage the loan payments control system from a fintech.
 

@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 
 from ..models import Loan, Payment, Client
 from ..serializers import LoanSerializer
+from .token import get_token
 
 
 class RegisterPaymentTest(TestCase):
@@ -31,9 +32,12 @@ class RegisterPaymentTest(TestCase):
                 2019, 3, 24, 11, 30).astimezone(tz=timezone.utc),
         )
 
+    def setUp(self):
+        self.client.defaults['HTTP_AUTHORIZATION'] = get_token()
+
     def test_register_valid_payment(self):
-        valid_payload = {"payment": "made",
-                         "amount": 100, "date": "2019-05-09 03:18Z"}
+        
+        valid_payload = {"payment": "made", "amount": 100, "date": "2019-05-09 03:18Z"}
         response = self.client.post(
             reverse('payments', kwargs={'pk': self.loan.pk}),
             data=json.dumps(valid_payload),

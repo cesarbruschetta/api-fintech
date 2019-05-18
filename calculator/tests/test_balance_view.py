@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 
 from ..models import Loan, Payment, Client
 from ..serializers import LoanSerializer
+from .token import get_token
 
 
 class BalanceViewTest(TestCase):
@@ -41,6 +42,9 @@ class BalanceViewTest(TestCase):
             date=datetime(2019, 5, 24).astimezone(tz=timezone.utc),
             amount=Decimal("200"),
         )
+
+    def setUp(self):
+        self.client.defaults['HTTP_AUTHORIZATION'] = get_token()
 
     def test_get_balance(self):
         valid_payload = {"date": "2019-06-09 03:18Z"}
