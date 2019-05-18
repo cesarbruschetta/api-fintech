@@ -4,6 +4,7 @@ from django.core.validators import MinValueValidator
 
 from decimal import Decimal, ROUND_DOWN
 from datetime import datetime, timezone
+from dateutil.relativedelta import relativedelta
 
 
 def increment_loan_id():
@@ -25,12 +26,16 @@ class Client(models.Model):
 
     @property
     def is_indebted(self):
-        missed_payments = (
-            Payment.objects.filter(loan_id__client=self, status="missed")
-            .distinct()
-            .count()
-        )
-        if missed_payments >= 3:
+        
+        loans = self.loan_set.all()
+        mp = 0
+        for loan in loans:
+            last_date = loan.date_initial + relativedelta(months=+loan.term)
+            balance = loan.get_balance(date_base=last_date)
+            if balance > 0:
+                mp = loan.missed_payments
+                
+        if mp >= 3:
             return True
         return False
 
@@ -72,14 +77,15 @@ class Loan(models.Model):
         decimal_places=2,
         validators=[MinValueValidator(Decimal("0.01"))],
     )
+    
+    @property
+    def missed_payments(self):
+        return self.payment_set.filter(status="missed").count()
 
     def _instalment_adjustment(self):
         loans_history = self.client.loan_set.all()
         missed_payments = sum(
-            [
-                Payment.objects.filter(loan_id=loan, status="missed").count()
-                for loan in loans_history
-            ]
+            [ load.missed_payments for load in loans_history]
         )
         if len(loans_history) >= 1:
             adjustment = Decimal('1')
