@@ -43,9 +43,9 @@ class PaymentSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Date of a payment before the creation date of its loan.")
         
         if data['amount'] > load.get_balance():
-            raise serializers.ValidationError("Payment amount higher than its loan balance.")
-        
+            raise serializers.ValidationError("Payment amount higher than its loan balance.")        
         return data
+
 
 class BalanceSerializer(serializers.Serializer):
     date = serializers.DateTimeField(
