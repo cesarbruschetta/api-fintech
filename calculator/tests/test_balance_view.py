@@ -28,7 +28,8 @@ class BalanceViewTest(TestCase):
             amount=Decimal("1000.00"),
             term=12,
             rate=Decimal("0.05"),
-            date_initial=datetime(2019, 3, 24, 11, 30).astimezone(tz=timezone.utc),
+            date_initial=datetime(
+                2019, 3, 24, 11, 30).astimezone(tz=timezone.utc),
         )
         Payment.objects.create(
             loan_id=cls.loan,

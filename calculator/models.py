@@ -26,14 +26,14 @@ class Client(models.Model):
 
     @property
     def is_indebted(self):
-        
+
         loans = self.loan_set.all()
         mp = 0
         for loan in loans:
             balance = loan.get_balance(date_base=loan.expiration_date)
             if balance > 0:
                 mp = loan.missed_payments
-                
+
         if mp >= 3:
             return True
         return False
@@ -93,11 +93,11 @@ class Loan(models.Model):
         decimal_places=2,
         validators=[MinValueValidator(Decimal("0.01"))],
     )
-    
+
     @property
     def expiration_date(self):
         return self.date_initial + relativedelta(months=+self.term)
-    
+
     @property
     def missed_payments(self):
         return self.payment_set.filter(status="missed").count()
@@ -105,7 +105,7 @@ class Loan(models.Model):
     def _rate_adjustment(self):
         loans_history = self.client.loan_set.all()
         missed_payments = sum(
-            [ loan.missed_payments for loan in loans_history]
+            [loan.missed_payments for loan in loans_history]
         )
         adjustment = Decimal('0.00')
         if len(loans_history) >= 1:
@@ -117,7 +117,6 @@ class Loan(models.Model):
 
     def calculate_instalment(self):
         """Returns a instalment value in loan creation"""
-        
 
         with localcontext() as ctx:
             ctx.rounding = ROUND_FLOOR
@@ -131,12 +130,6 @@ class Loan(models.Model):
                 / (ctx.power((1 + r), term)
                    - 1)) * amount).quantize(self.CENTS)
         return instalment
-
-    # def monthly_instalments(self):
-    #     """Returns a instalment value based on made/missed payments"""
-    #     remainder_instalments = self.term - self.payment_set.count()
-    #     next_instalment = (self.get_balance()/remainder_instalments).quantize(self.CENTS)
-    #     return next_instalment
 
     def get_balance(self, date_base=datetime.now().astimezone(tz=timezone.utc)):
         try:
@@ -177,23 +170,24 @@ class Payment(models.Model):
                                      MinValueValidator(Decimal("0.01"))
                                  ])
     amount_expected = models.DecimalField('Amount', max_digits=15, decimal_places=2, editable=False,
-                                 default=Decimal("0.00"), 
-                                 )
+                                          default=Decimal("0.00"),
+                                          )
 
     def _instalment_expected(self):
         """Returns a instalment value based on made/missed payments"""
         loan = self.loan_id
         remainder_instalments = loan.term - loan.payment_set.count()
-        next_instalment = (loan.get_balance()/remainder_instalments).quantize(self.CENTS)
+        next_instalment = (loan.get_balance() /
+                           remainder_instalments).quantize(self.CENTS)
         return next_instalment
-    
+
     def __str__(self):
         return f"Payment(loan_id={self.loan_id}, status={self.status}, date={self.date}, amount={self.amount})"
 
     def save(self, *args, **kwargs):
         self.amount_expected = self._instalment_expected()
         super(Payment, self).save(*args, **kwargs)
-    
+
     class Meta:
         verbose_name = "Payment"
         verbose_name_plural = "Payments"

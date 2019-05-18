@@ -35,15 +35,17 @@ class RegisterPaymentTest(TestCase):
     def setUp(self):
         self.client.defaults['HTTP_AUTHORIZATION'] = get_token()
 
-    def test_register_valid_payment(self):     
-        valid_payload = {"payment": "made", "amount": 100, "date": "2019-05-09 03:18Z"}
+    def test_register_valid_payment(self):
+        valid_payload = {"payment": "made",
+                         "amount": 100, "date": "2019-05-09 03:18Z"}
         response = self.client.post(
             reverse('payments', kwargs={'pk': self.loan.pk}),
             data=json.dumps(valid_payload),
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data, {"payment": "made", "received": "100.00", "expected": "85.69"})
+        self.assertEqual(
+            response.data, {"payment": "made", "received": "100.00", "expected": "85.69"})
 
     def test_register_payment_without_loan(self):
         valid_payload = {"payment": "made",
@@ -85,7 +87,7 @@ class RegisterPaymentTest(TestCase):
 
     def test_register_payment_invalid_format_date(self):
         invalid_payload = {"payment": "made",
-                         "amount": 100, "date": "20190509 03:18Z"}
+                           "amount": 100, "date": "20190509 03:18Z"}
         response = self.client.post(
             reverse('payments', kwargs={'pk': self.loan.pk}),
             data=json.dumps(invalid_payload),
@@ -100,14 +102,16 @@ class RegisterPaymentTest(TestCase):
             date=datetime(2019, 4, 24).astimezone(tz=timezone.utc),
             amount=Decimal("85.69"),
         )
-        valid_payload = {"payment": "made", "amount": 85.69, "date": "2019-04-25 03:18Z"}
-        
+        valid_payload = {"payment": "made",
+                         "amount": 85.69, "date": "2019-04-25 03:18Z"}
+
         response = self.client.post(
             reverse('payments', kwargs={'pk': self.loan.pk}),
             data=json.dumps(valid_payload),
             content_type="application/json",
         )
-        self.assertEqual(response.data, {"payment": "made", "received": "85.69", "expected": "85.69"})
+        self.assertEqual(
+            response.data, {"payment": "made", "received": "85.69", "expected": "85.69"})
 
     def test_expected_payment_posmaissed(self):
         Payment.objects.create(
@@ -116,11 +120,13 @@ class RegisterPaymentTest(TestCase):
             date=datetime(2019, 4, 24).astimezone(tz=timezone.utc),
             amount=Decimal("85.69"),
         )
-        valid_payload = {"payment": "made", "amount": 85.69, "date": "2019-05-24 03:18Z"}
-        
+        valid_payload = {"payment": "made",
+                         "amount": 85.69, "date": "2019-05-24 03:18Z"}
+
         response = self.client.post(
             reverse('payments', kwargs={'pk': self.loan.pk}),
             data=json.dumps(valid_payload),
             content_type="application/json",
         )
-        self.assertEqual(response.data, {"payment": "made", "received": "85.69", "expected": "93.48"})
+        self.assertEqual(
+            response.data, {"payment": "made", "received": "85.69", "expected": "93.48"})
