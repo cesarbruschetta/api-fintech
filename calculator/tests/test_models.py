@@ -276,58 +276,7 @@ class InstalmentTest(TestCase):
         self.assertEqual(original_instalment, Decimal('85.60'))
         self.assertGreater(self.loan_02.instalment, Decimal('85.60'))
 
-    def test_float_places_loan1(self):
-        _2places = Decimal("0.00")
-        loan = self.loan_01
-        with localcontext() as ctx:
-            ctx.rounding = ROUND_DOWN
-            rate = Decimal(f"{loan.rate}")
-            term = Decimal(f"{loan.term}")
-            amount = Decimal(f"{loan.amount}")
-            calculated_cost = ((
-                rate
-                + (rate
-                   / ((1 + (rate / term))
-                      ** term - 1)))
-                * amount).quantize(_2places)
-        total_cost = Decimal(loan.term * loan.instalment)
-        self.assertAlmostEqual(total_cost, calculated_cost, delta=0.08)
-
-    def test_float_places_loan2(self):
-        _2places = Decimal("0.00")
-        loan = self.loan_02
-        with localcontext() as ctx:
-            ctx.rounding = ROUND_DOWN
-            rate = Decimal(f"{loan.rate}")
-            term = Decimal(f"{loan.term}")
-            amount = Decimal(f"{loan.amount}")
-            calculated_cost = ((
-                rate
-                + (rate
-                   / ((1 + (rate / term))
-                      ** term - 1)))
-                * amount).quantize(_2places)
-        total_cost = Decimal(loan.term * loan.instalment)
-        self.assertAlmostEqual(total_cost, calculated_cost, delta=0.08)
-
-    def test_float_places_loan3(self):
-        _2places = Decimal("0.00")
-        loan = self.loan_03
-        with localcontext() as ctx:
-            ctx.rounding = ROUND_DOWN
-            rate = Decimal(f"{loan.rate}")
-            term = Decimal(f"{loan.term}")
-            amount = Decimal(f"{loan.amount}")
-            calculated_cost = ((
-                rate
-                + (rate
-                   / ((1 + (rate / term))
-                      ** term - 1)))
-                * amount).quantize(_2places)
-        total_cost = Decimal(loan.term * loan.instalment)
-        self.assertAlmostEqual(total_cost, calculated_cost, delta=0.08)
-
-    def test_float_places_loan4(self):
+    def proof_sample(self, loan):
         _2places = Decimal("0.00")
         loan = self.loan_04
         with localcontext() as ctx:
@@ -341,5 +290,30 @@ class InstalmentTest(TestCase):
                    / ((1 + (rate / term))
                       ** term - 1)))
                 * amount).quantize(_2places)
-        total_cost = Decimal(loan.term * loan.instalment)
-        self.assertAlmostEqual(total_cost, calculated_cost, delta=0.08)
+        return calculated_cost
+
+    def test_float_places_loan1(self):
+        loan = self.loan_01
+        loan_total_cost = Decimal(loan.term * loan.instalment)
+        proof_sample = self.proof_sample(loan)
+        self.assertAlmostEqual(loan_total_cost, proof_sample, delta=0.08)
+
+    def test_float_places_loan2(self):
+        loan = self.loan_02
+        loan_total_cost = Decimal(loan.term * loan.instalment)
+        proof_sample = self.proof_sample(loan)
+        self.assertAlmostEqual(loan_total_cost, proof_sample, delta=0.08)
+
+    def test_float_places_loan3(self):
+        loan = self.loan_03
+        loan_total_cost = Decimal(loan.term * loan.instalment)
+        proof_sample = self.proof_sample(loan)
+        self.assertAlmostEqual(loan_total_cost, proof_sample, delta=0.08)
+
+    def test_float_places_loan4(self):
+        loan = self.loan_04
+        loan_total_cost = Decimal(loan.term * loan.instalment)
+        proof_sample = self.proof_sample(loan)
+        self.assertAlmostEqual(loan_total_cost, proof_sample, delta=0.08)
+
+
