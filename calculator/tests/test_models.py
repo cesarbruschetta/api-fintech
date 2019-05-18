@@ -343,3 +343,5 @@ class InstalmentTest(TestCase):
                 * amount).quantize(_2places)
         total_cost = Decimal(loan.term * loan.instalment)
         self.assertAlmostEqual(total_cost, calculated_cost, delta=0.08)
+
+
