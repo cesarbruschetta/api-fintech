@@ -95,7 +95,7 @@ class RegisterPaymentTest(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_expected_payment_posmade(self):
+    def test_payment_expected_posmade(self):
         Payment.objects.create(
             loan_id=self.loan,
             status="made",
@@ -113,7 +113,7 @@ class RegisterPaymentTest(TestCase):
         self.assertEqual(
             response.data, {"payment": "made", "received": "85.69", "expected": "85.69"})
 
-    def test_expected_payment_posmaissed(self):
+    def test_payment_expected_posmissed(self):
         Payment.objects.create(
             loan_id=self.loan,
             status="missed",
