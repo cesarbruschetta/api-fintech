@@ -2,7 +2,7 @@ from django.db import models
 from django.forms import DecimalField
 from django.core.validators import MinValueValidator
 
-from decimal import Decimal, ROUND_DOWN, localcontext
+from decimal import Decimal, ROUND_FLOOR, localcontext
 from datetime import datetime, timezone
 
 
@@ -72,7 +72,7 @@ class Loan(models.Model):
         validators=[MinValueValidator(Decimal("0.01"))],
     )
     rate_adjust = models.DecimalField(
-        "Rate Auto Adjust",
+        "Adjustment",
         editable=False,
         default=Decimal('0.00'),
         max_digits=15,
@@ -108,7 +108,7 @@ class Loan(models.Model):
         _2places = Decimal("0.00")
 
         with localcontext() as ctx:
-            ctx.rounding = ROUND_DOWN
+            ctx.rounding = ROUND_FLOOR
             rate = Decimal(f"{self.rate}")
             term = Decimal(f"{self.term}")
             amount = Decimal(f"{self.amount}")
