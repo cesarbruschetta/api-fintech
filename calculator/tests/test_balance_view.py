@@ -62,7 +62,7 @@ class BalanceViewTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {"balance": Decimal("800")})
 
-    def test_get_balance_invalid_date(self):
+    def test_get_balance_without_date(self):
         valid_payload = {"date": ""}
         response = self.client.get(
             reverse('balance', kwargs={'pk': self.loan.pk}),
@@ -75,3 +75,11 @@ class BalanceViewTest(TestCase):
             reverse('balance', kwargs={'pk': '000-0000-0000-0015'})
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_balance_invalid_date(self):
+        valid_payload = {"date": "2019-01-01 03:18Z"}
+        response = self.client.get(
+            reverse('balance', kwargs={'pk': self.loan.pk}),
+            valid_payload
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
