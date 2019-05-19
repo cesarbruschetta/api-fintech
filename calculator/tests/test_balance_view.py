@@ -28,7 +28,8 @@ class BalanceViewTest(TestCase):
             amount=Decimal("1000.00"),
             term=12,
             rate=Decimal("0.05"),
-            date_initial=datetime(2019, 3, 24, 11, 30).astimezone(tz=timezone.utc),
+            date_initial=datetime(
+                2019, 3, 24, 11, 30).astimezone(tz=timezone.utc),
         )
         Payment.objects.create(
             loan_id=cls.loan,
@@ -53,14 +54,14 @@ class BalanceViewTest(TestCase):
             valid_payload
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {"balance": Decimal("600")})
+        self.assertEqual(response.data, {"balance": Decimal("627.20")})
 
     def test_get_balance_without_payload(self):
         response = self.client.get(
             reverse('balance', kwargs={'pk': self.loan.pk})
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {"balance": Decimal("800")})
+        self.assertEqual(response.data, {"balance": Decimal("827.20")})
 
     def test_get_balance_without_date(self):
         valid_payload = {"date": ""}

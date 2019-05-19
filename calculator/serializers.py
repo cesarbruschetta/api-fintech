@@ -20,7 +20,7 @@ class LoanSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def to_representation(self, obj):
-        return {"id": str(obj.id), "installment": round(float(obj.instalment), 2)}
+        return {"id": str(obj.id), "instalment": obj.instalment}
 
     def validate_client(self, client):
         if client.is_indebted:
@@ -34,12 +34,14 @@ class PaymentSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def to_representation(self, obj):
-        return {}
+        return {"payment": obj.status, "received": str(obj.amount), "expected":str(obj.amount_expected)}
 
     def validate(self, data):
-        load = data['loan_id']
-        if data['amount'] > load.get_balance():
-            raise serializers.ValidationError("Payment amount higher than its loan balance.")
+        loan = data['loan_id']
+        if data['date'] < loan.date_initial:
+            raise serializers.ValidationError("Date of a payment before the creation date of its loan.")      
+        if data['amount'] > loan.get_balance():
+            raise serializers.ValidationError("Payment amount higher than its loan balance.")        
         return data
 
     def validate_date(self, date):
