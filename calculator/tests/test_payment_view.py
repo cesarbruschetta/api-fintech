@@ -103,9 +103,8 @@ class RegisterPaymentTest(TestCase):
             date=datetime(2019, 4, 24).astimezone(tz=timezone.utc),
             amount=Decimal("85.69"),
         )
-        valid_payload = {"payment": "made",
-                         "amount": 85.69, "date": "2019-04-25 03:18Z"}
-
+        date = datetime.strftime(datetime.today().astimezone(tz=timezone.utc), "%Y-%m-%d %H:%M%z")
+        valid_payload = {"payment": "made", "amount": 85.69, "date": date}
         response = self.client.post(
             reverse('payments', kwargs={'pk': self.loan.pk}),
             data=json.dumps(valid_payload),

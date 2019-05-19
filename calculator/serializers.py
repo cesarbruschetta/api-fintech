@@ -37,10 +37,10 @@ class PaymentSerializer(serializers.ModelSerializer):
         return {"payment": obj.status, "received": str(obj.amount), "expected":str(obj.amount_expected)}
 
     def validate(self, data):
-      loan = data['loan_id']
+        loan = data['loan_id']
         if data['date'] < loan.date_initial:
             raise serializers.ValidationError("Date of a payment before the creation date of its loan.")      
-        if data['amount'] > loan.get_balance():
+        elif data['amount'] > loan.get_balance():
             raise serializers.ValidationError("Payment amount higher than its loan balance.")        
         return data
 
