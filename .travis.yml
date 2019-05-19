@@ -10,6 +10,6 @@ before_install:
     - pip install coveralls
 script:
   - python manage.py test -v2
-  - coverage run --omit="manage.py" --source="api_fintech/" --source="calculator/" manage.py test -v2
+  - coverage run --source="calculator/,api_fintech/" manage.py test -v2
 after_success:
   - coveralls
