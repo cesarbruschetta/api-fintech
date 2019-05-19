@@ -35,7 +35,8 @@ class ValidateloanPaymentTest(TestCase):
         self.client.defaults['HTTP_AUTHORIZATION'] = get_token()
         
     def test_register_payment_over_value(self):
-        valid_payloan = {"payment": "made", "amount": 2000, "date": "2019-02-01 03:18Z"}
+        date = datetime.strftime(datetime.today().astimezone(tz=timezone.utc), "%Y-%m-%d %H:%M%z")
+        valid_payloan = {"payment": "made", "amount": 2000, "date": date}
         response = self.client.post(
             reverse('payments', kwargs={'pk': self.loan.pk}),
             data=json.dumps(valid_payloan),
@@ -51,11 +52,13 @@ class ValidateloanPaymentTest(TestCase):
             data=json.dumps(valid_payloan),
             content_type="application/json",
         )
+        string_error = f"The date of payment need to be inside the current month {datetime.today().month}/{datetime.today().year}"
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("Date of a payment before the creation date of its loan.", response.json()["non_field_errors"])
+        self.assertIn(string_error, response.json()["date"])
         
     def test_register_payment_total_pay_afer_try_pay(self):
-        valid_payloan = {"payment": "made", "amount": 1000, "date": "2019-02-01 03:18Z"}
+        date = datetime.strftime(datetime.today().astimezone(tz=timezone.utc), "%Y-%m-%d %H:%M%z")
+        valid_payloan = {"payment": "made", "amount": 1000, "date": date}
         response = self.client.post(
             reverse('payments', kwargs={'pk': self.loan.pk}),
             data=json.dumps(valid_payloan),

@@ -37,14 +37,17 @@ class PaymentSerializer(serializers.ModelSerializer):
         return {}
 
     def validate(self, data):
-        
         load = data['loan_id']
-        if data['date'] < load.date_initial:
-            raise serializers.ValidationError("Date of a payment before the creation date of its loan.")
-        
         if data['amount'] > load.get_balance():
-            raise serializers.ValidationError("Payment amount higher than its loan balance.")        
+            raise serializers.ValidationError("Payment amount higher than its loan balance.")
         return data
+
+    def validate_date(self, date):
+        if date:
+            today = datetime.today()
+            if date.month != today.month or date.year != today.year:
+                raise serializers.ValidationError(f"The date of payment need to be inside the current month {today.month}/{today.year}")
+        return date
 
 
 class BalanceSerializer(serializers.Serializer):
