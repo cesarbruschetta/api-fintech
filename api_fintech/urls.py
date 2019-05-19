@@ -19,7 +19,8 @@ from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token
 
 urlpatterns = [
     path('', include('calculator.urls')),
+    path('', obtain_jwt_token),
     path('admin/', admin.site.urls),
     path('token/', obtain_jwt_token),
-    path('refresh-token/', refresh_jwt_token)
+    path('refresh-token/', refresh_jwt_token),
 ]
