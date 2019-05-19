@@ -46,7 +46,7 @@ class RegisterPaymentTest(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(
-            response.data, {"Instalment number": 1, "payment": "made", "received": "100.00", "expected": "85.69"})
+            response.data, {"instalment_number": 1, "payment": "made", "received": "100.00", "expected": "85.69"})
 
     def test_register_payment_without_loan(self):
         valid_payload = {"payment": "made",
@@ -111,7 +111,7 @@ class RegisterPaymentTest(TestCase):
             content_type="application/json",
         )
         self.assertEqual(
-            response.data, {"Instalment number": 2, "payment": "made", "received": "85.69", "expected": "85.69"})
+            response.data, {"instalment_number": 2, "payment": "made", "received": "85.69", "expected": "85.69"})
 
     def test_payment_expected_posmissed(self):
         Payment.objects.create(
@@ -129,4 +129,4 @@ class RegisterPaymentTest(TestCase):
             content_type="application/json",
         )
         self.assertEqual(
-            response.data, {"Instalment number": 2, "payment": "made", "received": "85.69", "expected": "93.48"})
+            response.data, {"instalment_number": 2, "payment": "made", "received": "85.69", "expected": "93.48"})

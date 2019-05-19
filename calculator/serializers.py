@@ -34,7 +34,7 @@ class PaymentSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def to_representation(self, obj):
-        return {"Instalment number": obj.payment_number, "payment": obj.status, "received": str(obj.amount), "expected":str(obj.amount_expected)}
+        return {"instalment_number": obj.payment_number, "payment": obj.status, "received": str(obj.amount), "expected":str(obj.amount_expected)}
 
     def validate(self, data):
         loan = data['loan_id']
