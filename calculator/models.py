@@ -179,6 +179,10 @@ class Payment(models.Model):
         remainder_instalments = loan.term - loan.payment_set.count()
         return (loan.get_balance() / remainder_instalments).quantize(self.CENTS)
 
+    @property
+    def payment_number(self):
+        return self.loan_id.payment_set.count()
+
     def __str__(self):
         return f"Payment(loan_id={self.loan_id}, status={self.status}, date={self.date}, amount={self.amount})"
 
