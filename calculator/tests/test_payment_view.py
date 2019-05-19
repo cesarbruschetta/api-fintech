@@ -36,8 +36,9 @@ class RegisterPaymentTest(TestCase):
         self.client.defaults['HTTP_AUTHORIZATION'] = get_token()
 
     def test_register_valid_payment(self):
-        valid_payload = {"payment": "made",
-                         "amount": 100, "date": "2019-05-09 03:18Z"}
+        date = datetime.strftime(datetime.today().astimezone(
+            tz=timezone.utc), "%Y-%m-%d %H:%M%z")
+        valid_payload = {"payment": "made", "amount": 100, "date": date}
         response = self.client.post(
             reverse('payments', kwargs={'pk': self.loan.pk}),
             data=json.dumps(valid_payload),
