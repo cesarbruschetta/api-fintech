@@ -40,7 +40,7 @@ class PaymentSerializer(serializers.ModelSerializer):
         loan = data['loan_id']
         if data['date'] < loan.date_initial:
             raise serializers.ValidationError("Date of a payment before the creation date of its loan.")      
-        elif data['amount'] > loan.get_balance():
+        if data['amount'] > loan.get_balance():
             raise serializers.ValidationError("Payment amount higher than its loan balance.")        
         return data
 
