@@ -43,7 +43,8 @@ class CreateNewLoanTest(TestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data, {'id': '000-0000-0000-0001', 'installment': 85.60})
+        self.assertEqual(
+            response.data, {'id': '000-0000-0000-0001', 'instalment': Decimal("85.60")})
 
     def test_create_invalid_term_loan(self):
         invalid_payload = {
@@ -60,7 +61,8 @@ class CreateNewLoanTest(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_invalid_amount_loan(self):
-        invalid_payload = {"term": 1, "rate": 0.05, "date": "2019-05-09 03:18Z"}
+        invalid_payload = {"term": 1, "rate": 0.05,
+                           "date": "2019-05-09 03:18Z"}
         response = self.client.post(
             reverse('loans'),
             data=json.dumps(invalid_payload),
@@ -98,7 +100,8 @@ class CreateNewLoanTest(TestCase):
             amount=Decimal("1000.00"),
             term=12,
             rate=Decimal("0.05"),
-            date_initial=datetime(2019, 3, 24, 11, 30).astimezone(tz=timezone.utc),
+            date_initial=datetime(
+                2019, 3, 24, 11, 30).astimezone(tz=timezone.utc),
         )
         Payment.objects.create(
             loan_id=loan_01,
@@ -132,7 +135,7 @@ class CreateNewLoanTest(TestCase):
             content_type="application/json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-    
+
     def test_create_client_have_debit(self):
 
         loan_01 = Loan.objects.create(
@@ -140,7 +143,8 @@ class CreateNewLoanTest(TestCase):
             amount=Decimal("1000.00"),
             term=12,
             rate=Decimal("0.05"),
-            date_initial=datetime(2019, 3, 24, 11, 30).astimezone(tz=timezone.utc),
+            date_initial=datetime(
+                2019, 3, 24, 11, 30).astimezone(tz=timezone.utc),
         )
         Payment.objects.create(
             loan_id=loan_01,

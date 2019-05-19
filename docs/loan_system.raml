@@ -75,13 +75,13 @@ types:
       loan_id:
         description: Unique id of the loan
         type: string
-      installment:
+      loan:
         description: Monthly loan payment
         type: number
         format: float
     example: {
               "loan_id": "000-0000-0000-0000",
-              "installment": 85.60
+              "loan": 85.60
              }
         
   LoanBalance:
@@ -111,6 +111,27 @@ types:
               "date": "2019-05-09T03:18:00Z",
               "amount": 85.60
              }      
+  Payment_info:
+    instalment_number:
+      description: Number of the last payment registered
+      type: number
+    status: 
+      description: Type of payment
+      type: string
+    amount:
+      description: Amount of the payment made or missed in dollars
+      type: number
+      format: float
+    expected:
+      description: Amount expected to be paid for the instalment
+      type: number
+      format: float
+    example:  {
+                "payment": "made", 
+                "received": "85.69", 
+                "expected": "93.48"
+              }
+
 traits:
   dataValidation:
     responses:
