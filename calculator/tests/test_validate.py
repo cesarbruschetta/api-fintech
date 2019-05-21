@@ -95,7 +95,7 @@ class ValidateClientLoanTest(TestCase):
     def setUp(self):
         self.client.defaults['HTTP_AUTHORIZATION'] = get_token()
 
-    def test_register_two_loan_unpayment(self):
+    def test_register_loan_with_threemissed(self):
         loan = Loan.objects.create(
             client=self.client_1,
             amount=Decimal("1000.00"),
@@ -107,6 +107,56 @@ class ValidateClientLoanTest(TestCase):
         Payment.objects.create(
             loan_id=loan,
             status="missed",
+            date=datetime(2019, 2, 1).astimezone(tz=timezone.utc),
+            amount=loan.instalment,
+        )
+        Payment.objects.create(
+            loan_id=loan,
+            status="missed",
+            date=datetime(2019, 3, 1).astimezone(tz=timezone.utc),
+            amount=loan.instalment,
+        )
+        Payment.objects.create(
+            loan_id=loan,
+            status="missed",
+            date=datetime(2019, 4, 1).astimezone(tz=timezone.utc),
+            amount=loan.instalment,
+        )
+        Payment.objects.create(
+            loan_id=loan,
+            status="made",
+            date=datetime(2019, 4, 1).astimezone(tz=timezone.utc),
+            amount="1027.20",
+        )
+
+        valid_payloan = {
+            "amount": 1000,
+            "term": 12,
+            "rate": 0.05,
+            "date": "2019-06-01 03:18Z",
+            "client_id": self.client_1.pk,
+        }
+        response = self.client.post(
+            reverse('loans'),
+            data=json.dumps(valid_payloan),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Denied loan request", response.json()["client"])
+    
+    
+    def test_register_two_loan_unpayment(self):
+        loan = Loan.objects.create(
+            client=self.client_1,
+            amount=Decimal("1000.00"),
+            term=12,
+            rate=Decimal("0.05"),
+            date_initial=datetime(2019, 1, 1, 12, 00).astimezone(tz=timezone.utc),
+        )
+        
+        Payment.objects.create(
+            loan_id=loan,
+            status="made",
             date=datetime(2019, 2, 1).astimezone(tz=timezone.utc),
             amount=loan.instalment,
         )
@@ -146,30 +196,17 @@ class ValidateClientLoanTest(TestCase):
             rate=Decimal("0.05"),
             date_initial=datetime(2019, 1, 1, 12, 00).astimezone(tz=timezone.utc),
         )
-
         Payment.objects.create(
             loan_id=loan,
-            status="missed",
-            date=datetime(2019, 2, 1).astimezone(tz=timezone.utc),
-            amount=loan.instalment,
-        )
-        Payment.objects.create(
-            loan_id=loan,
-            status="missed",
+            status="made",
             date=datetime(2019, 3, 1).astimezone(tz=timezone.utc),
             amount=loan.instalment,
         )
         Payment.objects.create(
             loan_id=loan,
-            status="missed",
-            date=datetime(2019, 4, 1).astimezone(tz=timezone.utc),
-            amount=loan.instalment,
-        )
-        Payment.objects.create(
-            loan_id=loan,
             status="made",
-            date=datetime(2019, 5, 1).astimezone(tz=timezone.utc),
-            amount=Decimal("1027.20"),
+            date=datetime(2019, 4, 1).astimezone(tz=timezone.utc),
+            amount=Decimal("941.6"),
         )
 
         valid_payloan = {
@@ -216,4 +253,5 @@ class ValidateClientLoanTest(TestCase):
             data=json.dumps(valid_payloan),
             content_type="application/json",
         )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Denied loan request", response.json()["client"])

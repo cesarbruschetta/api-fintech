@@ -29,12 +29,13 @@ class Client(models.Model):
 
         loans = self.loan_set.all()
         mp = 0
+        debt = 0
         for loan in loans:
-            balance = loan.get_balance(date_base=loan.expiration_date)
-            if balance >= 0:
-                mp = loan.missed_payments
+            mp += loan.missed_payments
+            if loan.expiration_date >= datetime.now(tz=timezone.utc):
+                debt += loan.get_balance()
 
-        if mp >= 3:
+        if mp >= 3 or debt > 0:
             return True
         return False
 
