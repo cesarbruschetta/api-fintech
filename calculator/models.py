@@ -31,7 +31,7 @@ class Client(models.Model):
         mp = 0
         for loan in loans:
             balance = loan.get_balance(date_base=loan.expiration_date)
-            if balance > 0:
+            if balance >= 0:
                 mp = loan.missed_payments
 
         if mp >= 3:
